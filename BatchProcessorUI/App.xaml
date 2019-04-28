@@ -1,0 +1,9 @@
+﻿<Application x:Class="BatchProcessorUI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:BatchProcessorUI.ViewModel"
+             StartupUri="View/BatchProcessorView.xaml">
+    <Application.Resources>
+        <local:BatchProcessorViewModel x:Key="BatchProcessorViewModel" />
+    </Application.Resources>
+</Application>
