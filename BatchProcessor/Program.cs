@@ -1,51 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Topshelf;
 
 namespace BatchProcessor
 {
     public class Program
-    {
-        public static readonly string SETTINGS_FILE = "settings.json";
-
+    {        
         static void Main(string[] args)
         {
-            ProcessorSettings settings = ProcessorSettings.LoadOrDefault(SETTINGS_FILE);
-
-            JobListener jobListener = null;
-            IJobManager jobManager = null;
-            JobWorker jobWorker = null;
-
-            if (settings.IsServer)
+            var rc = HostFactory.Run(x =>
             {
-                jobManager = new JobDispatcher(settings.WorkerPort, settings.LocalSlots);
-            }
-            else
-            {
-                jobWorker = new JobWorker(settings.ServerAddress, settings.WorkerPort, settings.JobServerPort, settings.LocalSlots);
-                jobManager = new LocalJobManager(settings.LocalSlots);
-            }
+                x.Service<Server>(s =>
+                {
+                    s.ConstructUsing(name => new Server());
+                    s.WhenStarted(server => server.Start());
+                    s.WhenStopped(server => server.Stop());
+                });
+                x.RunAsNetworkService();
 
-            jobListener = new JobListener(settings.JobServerPort, jobManager);
+                x.SetDescription("Batch Processor Service for running .NET jobs from remote clients");
+                x.SetDisplayName("Batch Processor");
+                x.SetServiceName("Batch Processor Service");                
+            });
 
-            Console.WriteLine("Press Enter to Exit");
-            Console.ReadLine();
-
-            if (jobListener != null)
-            {
-                jobListener.Dispose();
-                jobManager.Dispose();
-                jobListener = null;
-                jobManager = null;
-            }
-            if (jobWorker != null)
-            {
-                jobWorker.Dispose();
-                jobWorker = null;
-            }
+            var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
+            Environment.ExitCode = exitCode;            
         }
     }
 }

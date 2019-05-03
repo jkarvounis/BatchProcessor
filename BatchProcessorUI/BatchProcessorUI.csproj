@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -98,6 +99,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BatchProcessorAPI\BatchProcessorAPI.csproj">
+      <Project>{950d455d-c347-42a3-913d-cbe70be91301}</Project>
+      <Name>BatchProcessorAPI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BatchProcessor\BatchProcessor.csproj">
       <Project>{8644f2f0-1df0-4ed3-9b6b-153128fe2ed5}</Project>
       <Name>BatchProcessor</Name>

@@ -1,7 +1,6 @@
 ﻿using BatchProcessorUI.Model;
 using BatchProcessorUI.Util;
 using System.Diagnostics;
-using System.Windows.Input;
 
 namespace BatchProcessorUI.ViewModel
 {
@@ -9,11 +8,17 @@ namespace BatchProcessorUI.ViewModel
     {
         Process process = null;
 
-        public ICommand Start { get; private set; }
-        public ICommand Stop { get; private set; }
+        public ButtonCommand Start { get; private set; }
+        public ButtonCommand Stop { get; private set; }
 
-        public ICommand Save { get; private set; }
-        public ICommand Load { get; private set; }
+        public ButtonCommand Install { get; private set; }
+        public ButtonCommand Uninstall { get; private set; }
+
+        public ButtonCommand StartService { get; private set; }
+        public ButtonCommand StopService { get; private set; }
+
+        public ButtonCommand Save { get; private set; }
+        public ButtonCommand Load { get; private set; }
 
         public BatchProcessorState State { get; set; }
 
@@ -23,37 +28,41 @@ namespace BatchProcessorUI.ViewModel
 
             Start = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Starting BatchProcessor.exe...";
+                State.ConsoleText = "Starting Local BatchProcessor...";
 
-                process = new Process();
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = "BatchProcessor.exe";
-
-                startInfo.RedirectStandardError = true;
-                startInfo.RedirectStandardOutput = true;
-                startInfo.RedirectStandardInput = true;
-                startInfo.UseShellExecute = false;
-                startInfo.CreateNoWindow = true;
-
-                process.StartInfo = startInfo;
-                process.OutputDataReceived += Process_OutputDataReceived;
-                process.ErrorDataReceived += Process_ErrorDataReceived;
-                
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                RunProcess("", false);
             });
-
 
             Stop = new ButtonCommand(() =>
             {
-                if (process != null)
-                {
-                    process.StandardInput.WriteLine("Done");
-                    process.Close();
-                    process = null;
-                    State.ConsoleText = "Stopping BatchProcessor.exe...";
-                }
+                StopProcess();
+            });
+
+            Install = new ButtonCommand(() =>
+            {
+                State.ConsoleText = "Installing BatchProcessor Service...";
+
+                RunProcess("install", true);
+            });
+
+            Uninstall = new ButtonCommand(() =>
+            {
+                State.ConsoleText = "Uninstalling BatchProcessor Service...";
+
+                RunProcess("uninstall", true);
+            });
+
+            StartService = new ButtonCommand(() =>
+            {
+                State.ConsoleText = "Start BatchProcessor Service...";
+
+                RunProcess("start", true);
+            });
+
+            StopService = new ButtonCommand(() =>
+            {
+                State.ConsoleText = "Stop BatchProcessor Service...";
+                RunProcess("stop", true);
             });
 
             Save = new ButtonCommand(() =>
@@ -65,6 +74,50 @@ namespace BatchProcessorUI.ViewModel
             {
                 State.Load();
             });
+        }
+
+        private void RunProcess(string arguments, bool waitForExit)
+        {
+            StopProcess();
+
+            process = new Process();
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "BatchProcessor.exe",
+                Arguments = arguments,
+
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            process.StartInfo = startInfo;
+            process.OutputDataReceived += Process_OutputDataReceived;
+            process.ErrorDataReceived += Process_ErrorDataReceived;
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            if (waitForExit)
+            {
+                process.WaitForExit();
+                process = null;
+            }
+        }
+
+        private void StopProcess()
+        {
+            if (process != null)
+            {
+                process.StandardInput.Close();
+                process.Close();
+                process = null;
+                State.ConsoleText += "Stopping BatchProcessor...";
+            }
         }
 
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)

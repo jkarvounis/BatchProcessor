@@ -20,8 +20,12 @@
             <StackPanel>
                 <TextBlock Text="Control" FontSize="14" FontWeight="Bold" TextDecorations="Underline" Margin="5"/>
                 
-                <Button Content="Start" Command="{Binding Start}" Margin="5"/>
-                <Button Content="Stop" Command="{Binding Stop}" Margin="5"/>
+                <Button Content="Start Local" Command="{Binding Start}" Margin="5"/>
+                <Button Content="Stop Local" Command="{Binding Stop}" Margin="5"/>
+                <Button Content="Install Service" Command="{Binding Install}" Margin="5"/>
+                <Button Content="Uninstall Service" Command="{Binding Uninstall}" Margin="5"/>
+                <Button Content="Start Service" Command="{Binding StartService}" Margin="5"/>
+                <Button Content="Stop Service" Command="{Binding StopService}" Margin="5"/>
             </StackPanel>
         </Border>
 

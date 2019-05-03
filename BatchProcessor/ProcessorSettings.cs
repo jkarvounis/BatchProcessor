@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Configuration;
 using System.IO;
 
 namespace BatchProcessor
@@ -24,7 +23,7 @@ namespace BatchProcessor
 
         public override string ToString()
         {
-            return $"Settings:\nLocalSlots = {LocalSlots}\nJobServerPort = {JobServerPort}\nWorkerPort = {WorkerPort}\nServerAddress = {ServerAddress}\nIsServer = {IsServer}";
+            return $"LocalSlots = {LocalSlots}\nJobServerPort = {JobServerPort}\nWorkerPort = {WorkerPort}\nServerAddress = {ServerAddress}\nIsServer = {IsServer}";
         }
 
         public void Save(string path)

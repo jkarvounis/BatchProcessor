@@ -7,6 +7,9 @@ namespace TestApp
 {
     class Program
     {
+        private readonly static string SERVER_IP = "127.0.0.1";
+        private readonly static int SERVER_PORT = 1200;
+
         static object locker = new object();
 
         static void Main(string[] args)
@@ -38,7 +41,7 @@ namespace TestApp
                     jobs.Add(new Job($"Job-{i}", "TestApp.exe", i.ToString(), payload, "output.txt"));
 
                 // Create Job Scheduler, point to server IP and port
-                JobScheduler scheduler = new JobScheduler("127.0.0.1", 1200);
+                JobScheduler scheduler = new JobScheduler(SERVER_IP, SERVER_PORT);
 
                 // Schedule all 100 jobs in parallel, per completed job - print output
                 int completed = 0;
@@ -49,7 +52,10 @@ namespace TestApp
                     lock (locker)
                     {                      
                         Console.WriteLine($"Job Response {response.Completed}: {response.Name}");
-                        Console.WriteLine($"File: [{System.Text.Encoding.Default.GetString(response.ReturnFile)}] Output: [{response.ConsoleOutput}] Error: [{response.ConsoleError}]");
+                        string returnFile = "Empty";
+                        if (response.ReturnFile != null)
+                            returnFile = System.Text.Encoding.Default.GetString(response.ReturnFile);
+                        Console.WriteLine($"File: [{returnFile}] Output: [{response.ConsoleOutput}] Error: [{response.ConsoleError}]");
                         if (response.Completed)
                             completed++;
                     }
@@ -57,6 +63,7 @@ namespace TestApp
 
                 // Wait for user input before exiting
                 Console.WriteLine($"Done Sending Jobs - Completed: {completed}");
+                Console.WriteLine("Press ENTER to exit.");
                 Console.ReadLine();
             }
         }

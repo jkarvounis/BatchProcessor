@@ -9,12 +9,12 @@ namespace BatchProcessorUI.Model
 
         public BatchProcessorState()
         {
-            _settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Program.SETTINGS_FILE);
+            _settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Server.SETTINGS_FILE);
         }
 
         public void Load()
         {
-            BatchProcessor.ProcessorSettings settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Program.SETTINGS_FILE);
+            BatchProcessor.ProcessorSettings settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Server.SETTINGS_FILE);
             IsServer = settings.IsServer;
             LocalSlots = settings.LocalSlots;
             JobServerPort = settings.JobServerPort;
@@ -24,7 +24,7 @@ namespace BatchProcessorUI.Model
 
         public void Save()
         {
-            _settings.Save(BatchProcessor.Program.SETTINGS_FILE);
+            _settings.Save(BatchProcessor.Server.SETTINGS_FILE);
         }
 
         public string ConsoleText
