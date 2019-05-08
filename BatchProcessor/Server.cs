@@ -1,10 +1,11 @@
 ﻿using System;
+using System.IO;
 
 namespace BatchProcessor
 {
     public class Server
     {
-        public static readonly string SETTINGS_FILE = "settings.json";
+        public static readonly string SETTINGS_FILE = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData, Environment.SpecialFolderOption.Create), "BatchProcessor", "settings.json");
 
         ProcessorSettings settings = new ProcessorSettings();
 

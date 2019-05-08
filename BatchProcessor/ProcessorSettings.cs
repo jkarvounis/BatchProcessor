@@ -28,7 +28,8 @@ namespace BatchProcessor
 
         public void Save(string path)
         {
-            File.WriteAllText(path, JsonConvert.SerializeObject(this));
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
         public static ProcessorSettings Load(string path)
