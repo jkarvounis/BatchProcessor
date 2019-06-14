@@ -9,3 +9,9 @@ Jobs are defined as an executable command with optional arguments.  The job need
 # Change log
 
 Version 0.0 - This is not released yet.  Still a work in progress.
+
+
+
+*If you feel generous, and wish to support my projects:*
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=TU7QHT7UL6PR4&currency_code=USD)
