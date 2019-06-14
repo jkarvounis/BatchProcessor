@@ -112,11 +112,12 @@ namespace BatchProcessorUI.ViewModel
         private void StopProcess()
         {
             if (process != null)
-            {
+            {                
                 process.StandardInput.Close();
-                process.Close();
+                process.Kill();
+                process.Dispose();
                 process = null;
-                State.ConsoleText += "Stopping BatchProcessor...";
+                State.ConsoleText += System.Environment.NewLine + "Stopping BatchProcessor...";
             }
         }
 

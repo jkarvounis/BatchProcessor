@@ -158,6 +158,7 @@ Section "MainSection" MainSection
     ;Add Program Files Group
     CreateDirectory "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
     CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"              "$INSTDIR\${PRODUCT_EXE}"
+	CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"              "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
 
 SectionEnd
 
@@ -174,6 +175,10 @@ FunctionEnd
 ;------------------------------------------------------------------------------;
 
 Section "Uninstall"
+
+	; Remove the service if possible
+	nsExec::Exec "$INSTDIR\BatchProcessor.exe stop"
+	nsExec::Exec "$INSTDIR\BatchProcessor.exe uninstall"
 
     ; Remove Program Files Group
     RMDir /R "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"

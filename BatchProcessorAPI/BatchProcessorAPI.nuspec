@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <license type="file">LICENSE.txt</license>
+    <projectUrl>https://github.com/jkarvounis/BatchProcessor</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>.NET Batch Grid Computing Karvounis</tags>
+  </metadata>
+  <files>
+    <file src="LICENSE.txt" target="" />
+  </files>
+</package>

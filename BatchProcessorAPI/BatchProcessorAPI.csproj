@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>John Karvounis</Authors>
+    <Company>John Karvounis</Company>
+    <Description>API to interact with .NET Batch Processor.</Description>
+    <PackageProjectUrl>https://github.com/jkarvounis/BatchProcessor</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jkarvounis/BatchProcessor</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <Copyright>2019</Copyright>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseUrl></PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
