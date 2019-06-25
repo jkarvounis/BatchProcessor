@@ -26,25 +26,39 @@ namespace BatchProcessor
                         using (StreamReader reader = new StreamReader(networkStream))
                         using (StreamWriter writer = new StreamWriter(networkStream))
                         {
-                            Console.WriteLine("JobWorker connection established");
                             writer.AutoFlush = true;
 
                             writer.WriteLine(jobPort.ToString());
                             writer.WriteLine(totalSlots.ToString());
 
-                            while (isRunning && tcpClient.Connected)
+
+                            string response = reader.ReadLine();
+                            Console.WriteLine("JobWorker Pending - " + response);
+                            if (response != "PING")
                             {
-                                reader.ReadLine();
+                                System.Threading.Thread.Sleep(1000);    
+                                continue;
+                            }
+
+                            writer.WriteLine(totalSlots.ToString());
+
+                            Console.WriteLine("JobWorker connection established");
+
+                            while (isRunning && tcpClient.Connected && response == "PING")
+                            {
+                                response = reader.ReadLine();
                                 writer.WriteLine(totalSlots.ToString());
                             }
                         }
                     }
                     catch
-                    { }
-                    Console.WriteLine("JobWorker disconnected");
+                    { 
+                        System.Threading.Thread.Sleep(5000);    
+                    }                    
                 }
                 Console.WriteLine("JobWorker listenerThread exited");
             }));
+            listenerThread.Start();
         }
 
         public void Dispose()

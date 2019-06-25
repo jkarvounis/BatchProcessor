@@ -55,6 +55,8 @@ namespace BatchProcessor
 
         private async void HandleRemoteClientAsync(object r)
         {
+            UpdateMaxThreads();
+
             TcpClient tcpClient = (TcpClient)r;
             string clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
             Console.WriteLine("Received connection request from " + clientEndPoint);
@@ -87,8 +89,7 @@ namespace BatchProcessor
                 concurrencyLimit.Release();
                 if (tcpClient.Connected)
                     tcpClient.Close();                
-            }
-            UpdateMaxThreads();
+            }            
         }
 
         private void UpdateMaxThreads()

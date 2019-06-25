@@ -10,6 +10,10 @@ namespace BatchProcessor
     public class RemoteJobManager : IJobManager
     {
         TcpClient tcpClient;
+        NetworkStream networkStream;
+        StreamReader reader;
+        StreamWriter writer;
+
         Action onDisconnect;
         System.Threading.Timer heartbeatTimer;
         int totalSlots;
@@ -18,6 +22,7 @@ namespace BatchProcessor
         public RemoteJobManager(TcpClient remote, Action onDisconnect)
         {
             this.tcpClient = remote;
+
             this.onDisconnect = onDisconnect;
             this.totalSlots = 0;
 
@@ -28,13 +33,13 @@ namespace BatchProcessor
             {
                 remoteHost = ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString();
 
-                using (NetworkStream networkStream = tcpClient.GetStream())
-                using (StreamReader reader = new StreamReader(networkStream))
-                using (StreamWriter writer = new StreamWriter(networkStream))
-                {                                        
-                    remotePort = int.Parse(reader.ReadLine());
-                    totalSlots = int.Parse(reader.ReadLine());
-                }
+                networkStream = tcpClient.GetStream();
+                reader = new StreamReader(networkStream);
+                writer = new StreamWriter(networkStream);
+                writer.AutoFlush = true;
+
+                remotePort = int.Parse(reader.ReadLine());
+                totalSlots = int.Parse(reader.ReadLine());
             }
             catch
             {
@@ -51,17 +56,11 @@ namespace BatchProcessor
 
                 try
                 {
-                    using (NetworkStream networkStream = tcpClient.GetStream())
-                    using (StreamReader reader = new StreamReader(networkStream))
-                    using (StreamWriter writer = new StreamWriter(networkStream))
-                    {
-                        writer.AutoFlush = true;
-                        writer.WriteLine("PING");
-                        string response = reader.ReadLine();
-                        int slots = int.Parse(response);
-                        if (slots != totalSlots)
-                            Dispose();
-                    }
+                    writer.WriteLine("PING");
+                    string response = reader.ReadLine();
+                    int slots = int.Parse(response);
+                    if (slots != totalSlots)
+                        Dispose();
                 }
                 catch
                 {
@@ -72,6 +71,9 @@ namespace BatchProcessor
 
         public void Dispose()
         {
+            writer.Dispose();
+            reader.Dispose();
+            networkStream.Dispose();
             if (tcpClient.Connected)
                 tcpClient.Close();
             heartbeatTimer.Dispose();

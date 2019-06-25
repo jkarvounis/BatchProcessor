@@ -1,6 +1,7 @@
 ﻿using BatchProcessorUI.Model;
 using BatchProcessorUI.Util;
 using System.Diagnostics;
+using System.Windows;
 
 namespace BatchProcessorUI.ViewModel
 {
@@ -74,6 +75,13 @@ namespace BatchProcessorUI.ViewModel
             {
                 State.Load();
             });
+
+            Application.Current.MainWindow.Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            StopProcess();
         }
 
         private void RunProcess(string arguments, bool waitForExit)

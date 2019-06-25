@@ -9,7 +9,7 @@ namespace BatchProcessorUI.Views
     {
         public BatchProcessorView()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }        
     }
 }

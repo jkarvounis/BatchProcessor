@@ -41,7 +41,7 @@ namespace BatchProcessor
             tcpListener = new TcpListener(IPAddress.Any, workerPort);
             listenerThread = new Thread(new ThreadStart(() =>
             {
-                Console.WriteLine("JobListener listenerThread started");
+                Console.WriteLine("JobDispatcher listenerThread started");
                 try
                 {
                     tcpListener.Start();
@@ -54,7 +54,7 @@ namespace BatchProcessor
                 }
                 catch (Exception)
                 { }
-                Console.WriteLine("JobListener listenerThread exited");
+                Console.WriteLine("JobDispatcher listenerThread exited");
             }));
             listenerThread.Start();
         }
@@ -70,13 +70,19 @@ namespace BatchProcessor
             int remoteKey = ++key;
             RemoteJobManager remoteJobManager = new RemoteJobManager(tcpClient, () => RemoveMananger(remoteKey));
             lock (managers)
+            {
+                Console.WriteLine($"Added Worker {remoteKey}");
                 managers.Add(remoteKey, new JobCounter(remoteJobManager));
+            }
         }
 
         private void RemoveMananger(int key)
         {
             lock (managers)
+            {
+                Console.WriteLine($"Removed Worker {key}");
                 managers.Remove(key);
+            }
         }
 
         public int GetTotalSlots()
@@ -101,7 +107,7 @@ namespace BatchProcessor
                 if (managers.Count == 0)
                     return null;
 
-                return managers.Values.OrderByDescending(m => m.Usage).First();
+                return managers.Values.Where(m => m.Usage < double.MaxValue).OrderByDescending(m => m.Usage).First();
             }
         }
 
