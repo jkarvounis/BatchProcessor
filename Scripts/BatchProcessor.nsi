@@ -14,6 +14,7 @@
 !define PRODUCT_PUBLISHER_DISPLAY   "John Karvounis"
 !define PRODUCT_PUBLISHER           "Karvounis"
 !define PRODUCT_WEB_SITE            "https://github.com/jkarvounis/BatchProcessor"
+!define PRODUCT_DISPLAY_VERSION		"1.0.0.0"
 
 !define PRODUCT_UNINST_ROOT_KEY     "HKLM"
 !define PRODUCT_UNINST_KEY          "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -143,10 +144,13 @@ Section "MainSection" MainSection
     File "${BinDirectory}\System.Security.SecureString.dll"
     File "${BinDirectory}\System.Threading.Overlapped.dll"
 	File "${BinDirectory}\System.Xml.XPath.XDocument.dll"
-    File "${BinDirectory}\Topshelf.dll"
+    File "${BinDirectory}\Topshelf.dll"	
 
     ; Create Uninstaller
     WriteUninstaller "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
+	
+	; Add firewall rule
+	nsExec::Exec '"netsh" advfirewall firewall add rule name="${PRODUCT_NAME}" dir=in action=allow program="$INSTDIR\BatchProcessor.exe"'        
 
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"    "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName"        "${PRODUCT_NAME_DISPLAY}"
@@ -157,7 +161,7 @@ Section "MainSection" MainSection
 
     ;Add Program Files Group
     CreateDirectory "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
-    CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"              "$INSTDIR\${PRODUCT_EXE}"
+    CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"              		  "$INSTDIR\${PRODUCT_EXE}"
 	CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"              "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
 
 SectionEnd
@@ -179,6 +183,9 @@ Section "Uninstall"
 	; Remove the service if possible
 	nsExec::Exec "$INSTDIR\BatchProcessor.exe stop"
 	nsExec::Exec "$INSTDIR\BatchProcessor.exe uninstall"
+	
+	; Remove firewall rule
+	nsExec::Exec '"netsh" advfirewall firewall delete  rule name="${PRODUCT_NAME}"'  
 
     ; Remove Program Files Group
     RMDir /R "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
