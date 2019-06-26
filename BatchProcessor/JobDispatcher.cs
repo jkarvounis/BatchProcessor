@@ -22,7 +22,7 @@ namespace BatchProcessor
                 Manager = manager;
             }
 
-            public double Usage => Manager.GetTotalSlots() <= 0 ? double.MaxValue : ((double)Counter / Manager.GetTotalSlots());
+            public double Usage => Manager.GetTotalSlots() <= 0 ? double.MaxValue : ((double)(1 + Counter) / (1 + Manager.GetTotalSlots()));
         }
 
         int key = 1;
@@ -107,7 +107,7 @@ namespace BatchProcessor
                 if (managers.Count == 0)
                     return null;
 
-                return managers.Values.Where(m => m.Usage < double.MaxValue).OrderByDescending(m => m.Usage).First();
+                return managers.Values.Where(m => m.Usage < double.MaxValue).OrderBy(m => m.Usage).First();
             }
         }
 

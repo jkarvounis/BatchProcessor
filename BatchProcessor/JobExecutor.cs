@@ -57,12 +57,24 @@ namespace BatchProcessor
 
                     process.StartInfo = startInfo;
                     process.Start();
-                    process.WaitForExit();
 
-                    response.Completed = true;
-                    response.ConsoleOutput = process.StandardOutput.ReadToEnd();
-                    response.ConsoleError = process.StandardError.ReadToEnd();
-                    response.ReturnFile = null;
+                    // 1-hour auto-cleanup window
+                    if (process.WaitForExit(3600000))
+                    {
+                        response.Completed = true;
+                        response.ConsoleOutput = process.StandardOutput.ReadToEnd();
+                        response.ConsoleError = process.StandardError.ReadToEnd();
+                        response.ReturnFile = null;
+                    }
+                    else
+                    {
+                        response.Completed = false;
+                        process.Kill();
+                        response.ConsoleOutput = process.StandardOutput.ReadToEnd();
+                        response.ConsoleError = process.StandardError.ReadToEnd();
+                        response.ReturnFile = null;
+                        return response;
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(job.ReturnFilename))
