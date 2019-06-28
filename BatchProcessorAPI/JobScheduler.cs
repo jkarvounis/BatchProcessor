@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using BatchProcessorAPI.StreamUtil;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,18 +37,15 @@ namespace BatchProcessorAPI
         /// <param name="job">Job to execute remotely</param>
         /// <returns>Job response from server</returns>
         public async Task<JobResponse> Schedule(Job job)
-        {
-            string data = SerializeJob(job);
-            
+        {                        
             try
             {
                 using (TcpClient tcpClient = new TcpClient(hostname, port))
                 using (NetworkStream networkStream = tcpClient.GetStream())
                 using (StreamReader reader = new StreamReader(networkStream))
-                using (StreamWriter writer = new StreamWriter(networkStream))
                 {                    
-                    writer.AutoFlush = true;
-                    await writer.WriteLineAsync(data);
+                    await SerializeJob(networkStream, job);
+                    
                     string response = await reader.ReadLineAsync();
                     if (response != null)
                         return DeserializeResponse(response);
@@ -63,16 +62,26 @@ namespace BatchProcessorAPI
         /// Executes all the jobs on the server, waits for all the jobs to complete, calls delegates on complete or fail per job
         /// </summary>
         /// <param name="jobs">List of jobs to execute</param>
-        /// <param name="onResponse">Action on job response</param>
-        public void ScheduleAll(List<Job> jobs, Action<JobResponse> onResponse)
+        /// <param name="onResponse">Action on each job response as they complete</param>
+        /// <returns>Returns the list of job results after they all complete</returns>
+        public List<JobResponse> ScheduleAll(List<Job> jobs, Action<JobResponse> onResponse)
         {
-            var tasks = jobs.Select(async j =>
-            {
-                var r = await Schedule(j);
-                onResponse(r);
-            }).ToArray();                
+            List<Task<JobResponse>> taskList = new List<Task<JobResponse>>();
 
-            Task.WaitAll(tasks);
+            foreach (var job in jobs)
+            {
+                var j = job;
+                taskList.Add(Task.Run(async () =>
+                {
+                    JobResponse result = await Schedule(j);
+                    onResponse(result);
+                    return result;
+                }));
+            }
+
+            Task.WaitAll(taskList.ToArray());            
+
+            return taskList.Select(x=>x.Result).ToList();
         }
 
         private static JobResponse DeserializeResponse(string base64response)
@@ -86,16 +95,24 @@ namespace BatchProcessorAPI
             }
         }
 
-        private static string SerializeJob(Job job)
+        private static async Task SerializeJob(Stream stream, Job job)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (NotClosingCryptoStream crypto = new NotClosingCryptoStream(stream, new ToBase64Transform(), CryptoStreamMode.Write))
             {
-                using (BsonDataWriter writer = new BsonDataWriter(ms))
+                using (BsonDataWriter writer = new BsonDataWriter(crypto))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(writer, job);
-                }
-                return Convert.ToBase64String(ms.ToArray());
+                    writer.CloseOutput = false;
+
+                    JsonSerializer serializer = new JsonSerializer();                    
+                    serializer.Serialize(writer, job);                    
+                    await writer.FlushAsync();
+                }                    
+            }
+            
+            using (NotClosingStreamWriter writer = new NotClosingStreamWriter(stream))
+            {
+                await writer.WriteLineAsync();
+                await writer.FlushAsync();
             }
         }
 

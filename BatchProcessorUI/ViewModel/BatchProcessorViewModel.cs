@@ -44,6 +44,12 @@ namespace BatchProcessorUI.ViewModel
                 State.ConsoleText = "Installing BatchProcessor Service...";
 
                 RunProcess("install", true);
+
+                MessageBoxResult result = MessageBox.Show(
+                    "If you need to use Network Files, please make sure to edit the installed service.  Go to: Services -> Batch Processor -> Properties -> Log On and set an account with appropriate credentials.",
+                    "Network Credential Info",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             });
 
             Uninstall = new ButtonCommand(() =>

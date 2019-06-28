@@ -1,6 +1,7 @@
 ﻿using BatchProcessorAPI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 
 namespace TestApp
@@ -46,7 +47,7 @@ namespace TestApp
                 // Schedule all 100 jobs in parallel, per completed job - print output
                 int completed = 0;
                 Console.WriteLine("Sending Jobs");                
-                scheduler.ScheduleAll(jobs, response => 
+                var results = scheduler.ScheduleAll(jobs, response => 
                 {
                     // A lock to make output look nice
                     lock (locker)
@@ -63,6 +64,7 @@ namespace TestApp
 
                 // Wait for user input before exiting
                 Console.WriteLine($"Done Sending Jobs - Completed: {completed}");
+                Console.WriteLine($"Job Results - Completed: {results.Count(x=>x.Completed)}");
                 Console.WriteLine("Press ENTER to exit.");
                 Console.ReadLine();
             }

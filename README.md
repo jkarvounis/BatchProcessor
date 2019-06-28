@@ -96,6 +96,7 @@ Please make sure .NET Framework 4.7.1 is installed on the server.
 
 # Change log
 
+* Version 1.0.2 - Improved memory efficiency for large jobs.  Updated Server and Nuget.
 * Version 1.0.1 - Updated Nuget package to include proper dependencies.  Server install in now more reliable, minor bug fixes.
 * Version 1.0.0 - Initial public release!  Downloadable installer created.  Nuget package available.
 * Version 0.0.1 - This is not released yet.  Still a work in progress.

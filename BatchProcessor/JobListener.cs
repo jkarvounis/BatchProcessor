@@ -1,4 +1,5 @@
 ﻿using BatchProcessorAPI;
+using BatchProcessorAPI.StreamUtil;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using System;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BatchProcessor
 {
@@ -62,21 +62,25 @@ namespace BatchProcessor
             Console.WriteLine("Received connection request from " + clientEndPoint);
             concurrencyLimit.Wait();
             try
-            {
+            {                
                 using (NetworkStream networkStream = tcpClient.GetStream())
-                using (StreamReader reader = new StreamReader(networkStream))
-                using (StreamWriter writer = new StreamWriter(networkStream))
                 {
-                    writer.AutoFlush = true;
+                    Job jobRequest = null;
+                    using (NotClosingStreamReader reader = new NotClosingStreamReader(networkStream))
+                    {
+                        string request = await reader.ReadLineAsync();
+                        jobRequest = DeserializeRequest(request);
+                    }
 
-                    string request = reader.ReadLine();
-                    if (request != null)
-                    {                                               
-                        Job jobRequest = DeserializeRequest(request);
-                        JobResponse responseJob = await jobManager.ProcessJob(jobRequest);
+                    JobResponse responseJob = await jobManager.ProcessJob(jobRequest);
+
+                    using (NotClosingStreamWriter writer = new NotClosingStreamWriter(networkStream))
+                    {                                                
                         string response = SerializeResponse(responseJob);                        
-                        writer.WriteLine(response);
-                        Console.WriteLine("Completed connection request from " + clientEndPoint);
+                        await writer.WriteLineAsync(response);
+                        await writer.FlushAsync();
+
+                        Console.WriteLine("Completed connection request from " + clientEndPoint);                        
                     }
                 }
             }
