@@ -25,5 +25,18 @@ namespace BatchProcessorAPI
                 File.Delete(tempFile);
             }            
         }
+
+        public static string CreatePayloadFileWithWorkingDirectory()
+        {
+            string workingDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return CreatePayloadFileAtDirectory(workingDirectory);
+        }
+
+        public static string CreatePayloadFileAtDirectory(string directory)
+        {
+            string tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".zip");            
+            ZipFile.CreateFromDirectory(directory, tempFile);
+            return tempFile;            
+        }
     }
 }

@@ -1,13 +1,8 @@
-﻿using BatchProcessorAPI.StreamUtil;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
+﻿using BatchProcessorAPI.RestUtil;
+using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BatchProcessorAPI
@@ -17,8 +12,8 @@ namespace BatchProcessorAPI
     /// </summary>
     public class JobScheduler
     {
-        string hostname;
-        int port;
+        readonly IRestClient client;
+        Guid? payloadID;
 
         /// <summary>
         /// Constructor for the scheduler.  Requires remote server to be running with a valid hostname and TCP port
@@ -27,8 +22,87 @@ namespace BatchProcessorAPI
         /// <param name="tcpPort">TCP port of the server</param>
         public JobScheduler(string serverHostname, int tcpPort)
         {
-            this.hostname = serverHostname;
-            this.port = tcpPort;
+            client = new RestClient($"http://{serverHostname}:{tcpPort}")
+                .UseSerializer(() => new JsonNetSerializer());
+            payloadID = null;
+        }
+
+        /// <summary>
+        /// Uploads a payload for jobs
+        /// </summary>
+        /// <param name="path">Path to a .zip of the current payload</param>
+        /// <returns>True if successful</returns>
+        public bool UploadPayload(string path)
+        {
+            Task<bool> task = Task.Run(async () => await UploadPayloadAsync(path));            
+            return task.Result;
+        }
+
+        /// <summary>
+        /// Uploads a payload for jobs 
+        /// </summary>
+        /// <param name="path">Path to a .zip of the current payload</param>
+        /// <returns>True if successful</returns>
+        public async Task<bool> UploadPayloadAsync(string path)
+        {
+            try
+            {
+                var request = new RestRequest("payload");
+                request.AddFile("File", path);
+
+                var response = await client.PostAsync<Guid>(request);
+
+                if (response != null)
+                {
+                    payloadID = response;
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Uploads a payload for jobs 
+        /// </summary>
+        /// <param name="payload">Binary content of a .zip of the current payload</param>
+        /// <returns>True if successful</returns>
+        public bool UploadPayload(byte[] payload)
+        {
+            Task<bool> task = Task.Run(async () => await UploadPayloadAsync(payload));
+            return task.Result;
+        }
+
+        /// <summary>
+        /// Uploads a payload for jobs 
+        /// </summary>
+        /// <param name="payload">Binary content of a .zip of the current payload</param>
+        /// <returns>True if successful</returns>
+        public async Task<bool> UploadPayloadAsync(byte[] payload)
+        {
+            try
+            {
+                var request = new RestRequest("payload");
+                request.AddFileBytes("File", payload, "payload.zip");
+
+                var response = await client.PostAsync<Guid>(request);
+
+                if (response != null)
+                {
+                    payloadID = response;
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -36,21 +110,21 @@ namespace BatchProcessorAPI
         /// </summary>
         /// <param name="job">Job to execute remotely</param>
         /// <returns>Job response from server</returns>
-        public async Task<JobResponse> Schedule(Job job)
-        {                        
+        public async Task<JobResponse> ScheduleAsync(Job job)
+        {            
             try
             {
-                using (TcpClient tcpClient = new TcpClient(hostname, port))
-                using (NetworkStream networkStream = tcpClient.GetStream())
-                using (StreamReader reader = new StreamReader(networkStream))
-                {                    
-                    await SerializeJob(networkStream, job);
-                    
-                    string response = await reader.ReadLineAsync();
-                    if (response != null)
-                        return DeserializeResponse(response);
-                    return OnError(job, "No response from server");
-                }
+                job.PayloadID = payloadID;
+
+                var request = new RestRequest("job", DataFormat.Json);
+                request.AddJsonBody(job);
+
+                var response = await client.PostAsync<JobResponse>(request);
+                
+                if (response != null)
+                    return response;
+
+                return OnError(job, "No response from server");                
             }
             catch (Exception ex)
             {
@@ -73,7 +147,7 @@ namespace BatchProcessorAPI
                 var j = job;
                 taskList.Add(Task.Run(async () =>
                 {
-                    JobResponse result = await Schedule(j);
+                    JobResponse result = await ScheduleAsync(j);
                     onResponse(result);
                     return result;
                 }));
@@ -84,43 +158,10 @@ namespace BatchProcessorAPI
             return taskList.Select(x=>x.Result).ToList();
         }
 
-        private static JobResponse DeserializeResponse(string base64response)
-        {
-            byte[] responseData = Convert.FromBase64String(base64response);
-            MemoryStream ms = new MemoryStream(responseData);
-            using (BsonDataReader bsonReader = new BsonDataReader(ms))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<JobResponse>(bsonReader);
-            }
-        }
-
-        private static async Task SerializeJob(Stream stream, Job job)
-        {
-            using (NotClosingCryptoStream crypto = new NotClosingCryptoStream(stream, new ToBase64Transform(), CryptoStreamMode.Write))
-            {
-                using (BsonDataWriter writer = new BsonDataWriter(crypto))
-                {
-                    writer.CloseOutput = false;
-
-                    JsonSerializer serializer = new JsonSerializer();                    
-                    serializer.Serialize(writer, job);                    
-                    await writer.FlushAsync();
-                }                    
-            }
-            
-            using (NotClosingStreamWriter writer = new NotClosingStreamWriter(stream))
-            {
-                await writer.WriteLineAsync();
-                await writer.FlushAsync();
-            }
-        }
-
         private static JobResponse OnError(Job job, string message)
         {
             return new JobResponse()
             {
-                ID = job.ID,
                 Name = job.Name,
                 Completed = false,
                 ReturnFile = null,

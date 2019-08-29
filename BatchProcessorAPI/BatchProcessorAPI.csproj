@@ -15,17 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="StreamUtil\NotClosingStreamReader.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="StreamUtil\NotClosingStreamWriter.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <PackageReference Include="RestSharp" Version="106.6.10" />
   </ItemGroup>
 
 </Project>

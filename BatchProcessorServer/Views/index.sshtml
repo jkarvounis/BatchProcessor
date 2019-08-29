@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="5" >
+    <title>BatchProcessorServer</title>
+
+	<style type="text/css">
+
+		body {
+			text-align: center;
+		}
+
+	</style>
+
+</head>
+<body>
+	<img src="@Path['~/Content/nancy-logo.png']" alt="Nancy logo" /><br />
+	
+    <h3>Status</h3>
+    <div id ="status">
+        <p>Uploaded Payloads: @Model.PayloadCount</p>
+        <p>Job Queue: @Model.QueueSize</p>
+        <p>Workers: @Model.TotalWorkers</p>
+        <p>Slots: @Model.TotalCount</p>
+        <p>Current Jobs: @Model.TotalCurrent</p>
+        <p>Cluster Load: @Model.TotalLoad</p>
+    </div>
+
+    <h3>Workers</h3>
+    <div id ="workers">
+        @Partial['workers', Model.Workers];
+    </div>
+
+</body>
+</html>
