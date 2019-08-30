@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BatchProcessor.Jobs;
+using System;
 using System.IO;
 
 namespace BatchProcessor
@@ -9,9 +10,7 @@ namespace BatchProcessor
 
         ProcessorSettings settings = new ProcessorSettings();
 
-        JobListener jobListener = null;
-        IJobManager jobManager = null;
-        JobWorker jobWorker = null;
+        JobManager manager;
 
         public Server()
         {
@@ -23,33 +22,16 @@ namespace BatchProcessor
         public void Start()
         {
             Console.WriteLine("Server Started");
-            if (settings.IsServer)
-            {
-                jobManager = new JobDispatcher(settings.WorkerPort, settings.LocalSlots);
-            }
-            else
-            {
-                jobWorker = new JobWorker(settings.ServerAddress, settings.WorkerPort, settings.JobServerPort, settings.LocalSlots);
-                jobManager = new LocalJobManager(settings.LocalSlots);
-            }
-
-            jobListener = new JobListener(settings.JobServerPort, jobManager);
+            manager = new JobManager(settings);
         }
 
         public void Stop()
         {
-            Console.WriteLine("Server Stopped");
-            if (jobListener != null)
+            Console.WriteLine("Server Stopped");            
+            if (manager != null)
             {
-                jobListener.Dispose();
-                jobManager.Dispose();
-                jobListener = null;
-                jobManager = null;
-            }
-            if (jobWorker != null)
-            {
-                jobWorker.Dispose();
-                jobWorker = null;
+                manager.Dispose();
+                manager = null;
             }
         }
     }

@@ -7,23 +7,19 @@ namespace BatchProcessor
     public class ProcessorSettings
     {
         public int LocalSlots { get; set; }
-        public int JobServerPort { get; set; }
-        public int WorkerPort { get; set; }
+        public int ServerPort { get; set; }
         public string ServerAddress { get; set; }
-        public bool IsServer { get; set; }
 
         public ProcessorSettings()
         {
-            LocalSlots = Environment.ProcessorCount - 1;
-            JobServerPort = 1200;
-            WorkerPort = 1201;
-            ServerAddress = "";
-            IsServer = true;
+            LocalSlots = Environment.ProcessorCount - 1;            
+            ServerPort = 1200;
+            ServerAddress = "localhost";
         }
 
         public override string ToString()
         {
-            return $"LocalSlots = {LocalSlots}\nJobServerPort = {JobServerPort}\nWorkerPort = {WorkerPort}\nServerAddress = {ServerAddress}\nIsServer = {IsServer}";
+            return $"LocalSlots = {LocalSlots}\nServerPort = {ServerPort}\nServerAddress = {ServerAddress}";
         }
 
         public void Save(string path)

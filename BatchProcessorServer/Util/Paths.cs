@@ -10,13 +10,8 @@ namespace BatchProcessorServer.Util
         public static readonly string TEMP_DIR = Path.Combine(Path.GetTempPath(), "BatchProcessorServer");
 
         static Paths()
-        {
-            try
-            {
-                if (Directory.Exists(TEMP_DIR))
-                    Directory.Delete(TEMP_DIR, true);
-            }
-            catch { }
+        {            
+            FileUtil.TryDeleteDirectory(TEMP_DIR);
 
             if (!Directory.Exists(TEMP_DIR))
                 Directory.CreateDirectory(TEMP_DIR);

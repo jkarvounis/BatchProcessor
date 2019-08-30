@@ -18,7 +18,7 @@ namespace BatchProcessorServer
 
         private byte[] LoadFavIcon()
         {
-            using (var resourceStream = GetType().Assembly.GetManifestResourceStream("BatchProcessorServer.icon.png"))
+            using (var resourceStream = GetType().Assembly.GetManifestResourceStream("BatchProcessorServer.logo.ico"))
             {
                 var memoryStream = new MemoryStream();
                 resourceStream.CopyTo(memoryStream);
