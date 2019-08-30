@@ -106,7 +106,7 @@ namespace BatchProcessorServer.Modules
                 return job.job;
             });
 
-            Post("/{jobID}/{workerID}/heatbeat", async parameters =>
+            Put("/{jobID}/{workerID}/heatbeat", async parameters =>
             {
                 await locker.WaitAsync();
                 if (!jobList.ContainsKey(parameters.workerID))

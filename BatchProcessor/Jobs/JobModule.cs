@@ -77,21 +77,25 @@ namespace BatchProcessor.Jobs
             }
         }
 
-        public void SendHeartbeat()
+        public bool SendHeartbeat()
         {
             Guid? id = currentJobID;
 
             if (id == null)
-                return;
+                return false;
 
             try
             {
                 var request = new RestRequest($"job/{id}/{workerID}/heartbeat");
-                client.ExecuteAsPost(request, "POST");
+                var response = client.Put(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    return true;
             }
             catch
             {
             }
+
+            return false;
         }
 
         public void Dispose()
@@ -120,19 +124,21 @@ namespace BatchProcessor.Jobs
             return null;
         }
 
-        private void SendResponse(JobResponse results)
+        private bool SendResponse(JobResponse results)
         {
             try
             {
                 var request = new RestRequest($"job/{results.ID}/{workerID}");
                 request.AddJsonBody(results);
                 var response = client.Delete(request);
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                    Console.WriteLine("FAILED TO SEND JOB RESPONSE");
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    return true;
             }
             catch
             {
             }
+
+            return false;
         }
     }
 }
