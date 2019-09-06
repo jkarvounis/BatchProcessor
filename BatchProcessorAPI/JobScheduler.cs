@@ -10,7 +10,7 @@ namespace BatchProcessorAPI
     /// <summary>
     /// Class that sends jobs to the server and waits for responses
     /// </summary>
-    public class JobScheduler
+    public class JobScheduler : IDisposable
     {
         readonly IRestClient client;
         Guid? payloadID;
@@ -28,12 +28,21 @@ namespace BatchProcessorAPI
         }
 
         /// <summary>
+        /// Remove resources from the server
+        /// </summary>
+        public void Dispose()
+        {
+            RemovePayload();
+        }
+
+        /// <summary>
         /// Uploads a payload for jobs
         /// </summary>
         /// <param name="path">Path to a .zip of the current payload</param>
         /// <returns>True if successful</returns>
         public bool UploadPayload(string path)
         {
+            RemovePayload();
             Task<bool> task = Task.Run(async () => await UploadPayloadAsync(path));            
             return task.Result;
         }
@@ -106,6 +115,40 @@ namespace BatchProcessorAPI
         }
 
         /// <summary>
+        /// Remove previously uploaded payload
+        /// </summary>
+        /// <returns>True if successfully removed from server</returns>
+        public bool RemovePayload()
+        {
+            if (payloadID.HasValue)
+            {
+                var request = new RestRequest($"payload/{payloadID.Value}");
+                var response = client.Delete(request);
+                if (response.IsSuccessful)
+                    payloadID = null;
+                return response.IsSuccessful;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Remove previously uploaded payload
+        /// </summary>
+        /// <returns>True if successfully removed from server</returns>
+        public async Task<bool> RemovePayloadAsync()
+        {
+            if (payloadID.HasValue)
+            {
+                var request = new RestRequest($"payload/{payloadID.Value}");
+                var response = await client.DeleteAsync<bool>(request);
+                if (response)
+                    payloadID = null;
+                return response;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Async function to schedule a job on the server 
         /// </summary>
         /// <param name="job">Job to execute remotely</param>
@@ -168,6 +211,6 @@ namespace BatchProcessorAPI
                 ConsoleOutput = null,
                 ConsoleError = message
             };
-        }
+        }        
     }
 }

@@ -9,6 +9,7 @@ namespace BatchProcessor.Jobs
     {
         IRestClient client;
         Guid workerID;
+        int threadID;
 
         SemaphoreSlim locker = new SemaphoreSlim(1);
         Guid? _currentJobID = null;
@@ -32,10 +33,11 @@ namespace BatchProcessor.Jobs
         Thread thread;
         bool isRunning;
 
-        public JobModule(IRestClient client, Guid workerID)
+        public JobModule(IRestClient client, Guid workerID, int threadID)
         {
             this.client = client;
             this.workerID = workerID;
+            this.threadID = threadID;
 
             isRunning = true;
             thread = new Thread(new ThreadStart(mainLoop));
@@ -60,7 +62,7 @@ namespace BatchProcessor.Jobs
                 string payloadDir = null;
                 if (job.PayloadID != null)
                 {
-                    payloadDir = BatchProcessor.Util.PayloadUtil.GetPayload(client, job.PayloadID.Value);
+                    payloadDir = BatchProcessor.Util.PayloadUtil.GetPayload(client, job.PayloadID.Value, threadID);
                     if (payloadDir == null)
                     {
                         Console.WriteLine("FAILED TO GET PAYLOAD");
@@ -72,9 +74,19 @@ namespace BatchProcessor.Jobs
 
                 JobResponse response = JobExecutor.Execute(job, payloadDir);
                 SendResponse(response);
-                
+
+                if (job.PayloadID != null)
+                {
+                    BatchProcessor.Util.PayloadUtil.ReleasePayload(job.PayloadID.Value, threadID);
+                }
+
                 currentJobID = null;
             }
+        }
+
+        public bool HasJob()
+        {
+            return currentJobID != null;
         }
 
         public bool SendHeartbeat()

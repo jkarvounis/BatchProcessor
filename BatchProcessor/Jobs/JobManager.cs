@@ -1,10 +1,9 @@
-﻿using BatchProcessorAPI.RestUtil;
+﻿using BatchProcessor.Util;
+using BatchProcessorAPI.RestUtil;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BatchProcessor.Jobs
 {
@@ -27,7 +26,7 @@ namespace BatchProcessor.Jobs
 
             modules = new List<JobModule>(settings.LocalSlots);
             for (int i = 0; i < settings.LocalSlots; i++)
-                modules.Add(new JobModule(client, workerID));
+                modules.Add(new JobModule(client, workerID, i));
 
             heatbeatTimer = new System.Timers.Timer(5000);
             heatbeatTimer.Elapsed += HeatbeatTimer_Elapsed;
@@ -36,10 +35,17 @@ namespace BatchProcessor.Jobs
 
         private void HeatbeatTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Register();
+            bool online = Register();
 
             foreach (JobModule module in modules)
                 module.SendHeartbeat();
+
+            int jobCount = modules.Count(m => m.HasJob());
+
+            if (jobCount == 0)
+                PayloadUtil.CleanupPayloads();
+
+            Console.WriteLine($"Status: {(online ? "ONLINE" : "OFFLINE")} - {jobCount}/{modules.Count} Jobs");
         }
 
         public void Dispose()

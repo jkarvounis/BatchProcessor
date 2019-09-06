@@ -67,13 +67,21 @@ namespace TestApp
                             if (response.Completed)
                                 completed++;
                         }
-                    });
+                    });                    
 
                     // Wait for user input before exiting
                     Console.WriteLine($"Done Sending Jobs - Completed: {completed}");
                     Console.WriteLine($"Job Results - Completed: {results.Count(x => x.Completed)}");
+
+                    bool removed = scheduler.RemovePayload();
+                    Console.WriteLine($"Removed Payload: {removed}");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to upload payload");
                 }
                 
+
                 Console.WriteLine("Press ENTER to exit.");
                 Console.ReadLine();
             }
