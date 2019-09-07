@@ -4,27 +4,27 @@ namespace BatchProcessorUI.Model
 {
     public class BatchProcessorState : ModelBase
     {
-        private BatchProcessor.ProcessorSettings _settings;
+        private BatchProcessor.Server.Settings _settings;
         private string text;
 
         public BatchProcessorState()
         {
-            _settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Server.SETTINGS_FILE);
+            _settings = BatchProcessor.Server.Settings.Load(BatchProcessor.Util.Paths.SETTINGS_FILE);
         }
 
         public void Load()
         {
-            BatchProcessor.ProcessorSettings settings = BatchProcessor.ProcessorSettings.LoadOrDefault(BatchProcessor.Server.SETTINGS_FILE);
-            IsServer = settings.IsServer;
+            BatchProcessor.Server.Settings settings = BatchProcessor.Server.Settings.Load(BatchProcessor.Util.Paths.SETTINGS_FILE);
+
             LocalSlots = settings.LocalSlots;
-            JobServerPort = settings.JobServerPort;
-            WorkerPort = settings.WorkerPort;
+            ServerPort = settings.ServerPort;
             ServerAddress = settings.ServerAddress;
+            HeartbeatMs = settings.HeartbeatMs;
         }
 
         public void Save()
         {
-            _settings.Save(BatchProcessor.Server.SETTINGS_FILE);
+            _settings.Save(BatchProcessor.Util.Paths.SETTINGS_FILE);
         }
 
         public string ConsoleText
@@ -36,34 +36,6 @@ namespace BatchProcessorUI.Model
                 {
                     text = value;
                     RaisePropertyChanged("ConsoleText");
-                }
-            }
-        }
-
-        public bool IsServer
-        {
-            get { return _settings.IsServer; }
-            set
-            {                
-                if (_settings.IsServer != value)
-                {
-                    _settings.IsServer = value;
-                    RaisePropertyChanged("IsServer");
-                    RaisePropertyChanged("IsWorker");
-                }
-            }
-        }
-
-        public bool IsWorker
-        {
-            get { return !_settings.IsServer; }
-            set
-            {
-                if (_settings.IsServer != !value)
-                {
-                    _settings.IsServer = !value;
-                    RaisePropertyChanged("IsServer");
-                    RaisePropertyChanged("IsWorker");
                 }
             }
         }
@@ -81,28 +53,15 @@ namespace BatchProcessorUI.Model
             }
         }
 
-        public int JobServerPort
+        public int ServerPort
         {
-            get { return _settings.JobServerPort; }
+            get { return _settings.ServerPort; }
             set
             {
-                if (_settings.JobServerPort != value)
+                if (_settings.ServerPort != value)
                 {
-                    _settings.JobServerPort = value;
-                    RaisePropertyChanged("JobServerPort");
-                }
-            }
-        }
-
-        public int WorkerPort
-        {
-            get { return _settings.WorkerPort; }
-            set
-            {
-                if (_settings.WorkerPort != value)
-                {
-                    _settings.WorkerPort = value;
-                    RaisePropertyChanged("WorkerPort");
+                    _settings.ServerPort = value;
+                    RaisePropertyChanged("ServerPort");
                 }
             }
         }
@@ -116,6 +75,19 @@ namespace BatchProcessorUI.Model
                 {
                     _settings.ServerAddress = value;
                     RaisePropertyChanged("ServerAddress");
+                }
+            }
+        }
+
+        public int HeartbeatMs
+        {
+            get { return _settings.HeartbeatMs; }
+            set
+            {
+                if (_settings.HeartbeatMs != value)
+                {
+                    _settings.HeartbeatMs = value;
+                    RaisePropertyChanged("HeartbeatMs");
                 }
             }
         }

@@ -29,7 +29,7 @@ namespace BatchProcessorUI.ViewModel
 
             Start = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Starting Local BatchProcessor...";
+                State.ConsoleText = "Starting Local BatchProcessor..." + System.Environment.NewLine;
 
                 RunProcess("", false);
             });
@@ -41,12 +41,14 @@ namespace BatchProcessorUI.ViewModel
 
             Install = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Installing BatchProcessor Service...";
+                State.ConsoleText = "Installing BatchProcessor Service..." + System.Environment.NewLine;
 
                 RunProcess("install", true);
 
                 MessageBoxResult result = MessageBox.Show(
-                    "If you need to use Network Files, please make sure to edit the installed service.  Go to: Services -> Batch Processor -> Properties -> Log On and set an account with appropriate credentials.",
+                    "If you need to use Network Files, please make sure to:" + System.Environment.NewLine + System.Environment.NewLine +
+                    "Options 1) Edit the installed service.  Go to: Services -> Batch Processor -> Properties -> Log On and set an account with appropriate credentials." + System.Environment.NewLine + System.Environment.NewLine +
+                    "Options 2) Add credentials for the NetworkService user via Administrator Command Line.",
                     "Network Credential Info",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -54,27 +56,33 @@ namespace BatchProcessorUI.ViewModel
 
             Uninstall = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Uninstalling BatchProcessor Service...";
+                State.ConsoleText = "Uninstalling BatchProcessor Service..." + System.Environment.NewLine;
 
                 RunProcess("uninstall", true);
             });
 
             StartService = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Start BatchProcessor Service...";
+                State.ConsoleText = "Start BatchProcessor Service..." + System.Environment.NewLine;
 
                 RunProcess("start", true);
             });
 
             StopService = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Stop BatchProcessor Service...";
+                State.ConsoleText = "Stop BatchProcessor Service..." + System.Environment.NewLine;
+
                 RunProcess("stop", true);
             });
 
             Save = new ButtonCommand(() =>
             {
+                State.ConsoleText = "Saving Config, Restarting BatchProcessor Service..." + System.Environment.NewLine;
+
                 State.Save();
+
+                RunProcess("stop", true);
+                RunProcess("start", true);
             });
 
             Load = new ButtonCommand(() =>

@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"      
         mc:Ignorable="d"
         DataContext="{StaticResource BatchProcessorViewModel}"
-        Title="Batch Processor" Height="600" Width="500">
-    <Grid>
+        Title="Batch Processor" Height="600" Width="500" MinWidth="400" MinHeight="500">
+    <Grid Margin="0,0,2,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Border Grid.Column="0" Grid.Row="0" CornerRadius="6" BorderBrush="DarkGray" BorderThickness="2" Margin="5">
             <StackPanel>
@@ -30,34 +30,38 @@
         </Border>
 
         <Border Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" CornerRadius="6" BorderBrush="DarkGray" BorderThickness="2" Margin="5">
-            <StackPanel>
-                <TextBlock Text="Server Config" FontSize="14" FontWeight="Bold" TextDecorations="Underline" Margin="5"/>
-                <Border Grid.Column="0" Grid.Row="0" CornerRadius="6" BorderBrush="DarkGray" BorderThickness="2" Margin="5">
-                    <StackPanel Margin="5">
-                        <TextBlock Text="Mode"/>
-                        <RadioButton Content="Server Mode" GroupName="Mode" IsChecked="{Binding State.IsServer}"/>
-                        <RadioButton Content="Worker Mode" GroupName="Mode" IsChecked="{Binding State.IsWorker}"/>
-                    </StackPanel>
-                </Border>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Job Port" Margin="2"/>
-                    <TextBox Text="{Binding State.JobServerPort}" Width="50"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Worker Port" Margin="2"/>
-                    <TextBox Text="{Binding State.WorkerPort}" Width="50"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Server Address" Margin="2"/>
-                    <TextBox Text="{Binding State.ServerAddress}" Width="80"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Max Local Slots" Margin="2"/>
-                    <TextBox Text="{Binding State.LocalSlots}" Width="50"/>
-                </StackPanel>
-                <Button Content="Save" Command="{Binding Save}" Margin="5"/>
-                <Button Content="Load" Command="{Binding Load}" Margin="5"/>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Config" FontSize="14" FontWeight="Bold" TextDecorations="Underline" Margin="5"/>
+                
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Server Address" Margin="10"/>
+                <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding State.ServerAddress}" Width="80" HorizontalAlignment="Left" Margin="5"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="2 " Text="Server Port" Margin="10"/>
+                <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding State.ServerPort}" Width="50" HorizontalAlignment="Left" Margin="5"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Max Local Slots" Margin="10"/>
+                <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding State.LocalSlots}" Width="50" HorizontalAlignment="Left" Margin="5"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="Heartbeat (ms)" Margin="10"/>
+                <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding State.HeartbeatMs}" Width="50" HorizontalAlignment="Left" Margin="5"/>
+
+                <Button Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" Content="Save" Command="{Binding Save}" Margin="50,5"/>
+                <Button Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" Content="Load" Command="{Binding Load}" Margin="50,5"/>
+            </Grid>
         </Border>
 
         <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" CornerRadius="6" BorderBrush="DarkGray" BorderThickness="2" Margin="5">

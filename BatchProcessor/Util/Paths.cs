@@ -13,7 +13,7 @@ namespace BatchProcessor.Util
 
         public static readonly string TEMP_DIR = Path.Combine(Path.GetTempPath(), "BatchProcessorWorker");
 
-        static Paths()
+        public static void CleanupTemp()
         {
             FileUtil.TryDeleteDirectory(TEMP_DIR);
 

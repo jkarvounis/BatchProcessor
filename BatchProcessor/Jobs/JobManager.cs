@@ -16,19 +16,19 @@ namespace BatchProcessor.Jobs
 
         System.Timers.Timer heatbeatTimer;
 
-
-        public JobManager(ProcessorSettings settings)
+        public JobManager(string serverUri, int localSlots, int heartbeatMs)
         {
-            client = new RestClient($"http://{settings.ServerAddress}:{settings.ServerPort}")
+            client = new RestClient(serverUri)
                 .UseSerializer(() => new JsonNetSerializer());
 
             workerID = Guid.NewGuid();
+            Console.WriteLine($"WorkerID = {workerID}");
 
-            modules = new List<JobModule>(settings.LocalSlots);
-            for (int i = 0; i < settings.LocalSlots; i++)
+            modules = new List<JobModule>(localSlots);
+            for (int i = 0; i < localSlots; i++)
                 modules.Add(new JobModule(client, workerID, i));
 
-            heatbeatTimer = new System.Timers.Timer(5000);
+            heatbeatTimer = new System.Timers.Timer(heartbeatMs);
             heatbeatTimer.Elapsed += HeatbeatTimer_Elapsed;
             heatbeatTimer.Start();
         }
@@ -50,10 +50,16 @@ namespace BatchProcessor.Jobs
 
         public void Dispose()
         {
-            heatbeatTimer.Stop();
+            if (heatbeatTimer != null)
+            {
+                heatbeatTimer.Stop();
+                heatbeatTimer = null;
+            }
 
             foreach (JobModule module in modules)
                 module.Dispose();
+
+            modules.Clear();
         }
 
         private bool Register()

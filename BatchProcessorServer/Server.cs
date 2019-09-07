@@ -25,11 +25,20 @@ namespace BatchProcessorServer
                 return $"[Port: {Port}, HeartbeatMs: {HeartbeatMs}]";
             }
 
+            public void Save(string path)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented));
+            }
+
             public static Settings Load(string path)
             {
                 if (File.Exists(path))
                     return JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
-                return new Settings();
+
+                Settings defaultSettings = new Settings();
+                defaultSettings.Save(path);
+                return defaultSettings;
             }
         }
 
@@ -51,6 +60,8 @@ namespace BatchProcessorServer
 
             settings = Settings.Load(Paths.SETTINGS_FILE);
             Console.WriteLine($"Loaded Settings: {settings}");
+
+            Paths.CleanupTemp();
 
             var uri = new Uri($"http://localhost:{settings.Port}");
             host = new NancyHost(uri);
