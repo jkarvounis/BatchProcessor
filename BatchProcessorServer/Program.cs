@@ -1,6 +1,5 @@
 ﻿using System;
-using BatchProcessorServer.Modules;
-using Nancy.Hosting.Self;
+using Topshelf;
 
 namespace BatchProcessorServer
 {
@@ -8,29 +7,23 @@ namespace BatchProcessorServer
     {
         static void Main(string[] args)
         {
-            var uri =
-                new Uri("http://localhost:1200");
-
-            using (var host = new NancyHost(uri))
-            using (System.Timers.Timer timer = new System.Timers.Timer(10000))
+            var rc = HostFactory.Run(x =>
             {
-                timer.Elapsed += Timer_Elapsed;                
-                host.Start();
-                timer.Start();
-                
+                x.Service<Server>(s =>
+                {
+                    s.ConstructUsing(name => new Server());
+                    s.WhenStarted(server => server.Start());
+                    s.WhenStopped(server => server.Stop());
+                });
+                x.RunAsLocalSystem();
 
-                Console.WriteLine("Your application is running on " + uri);
-                Console.WriteLine("Press any [Enter] to close the host.");
-                Console.ReadLine();
+                x.SetDescription("Batch Processor Server Service for running .NET jobs from remote clients");
+                x.SetDisplayName("Batch Processor Server");
+                x.SetServiceName("Batch Processor Server Service");
+            });
 
-                timer.Stop();
-            }
-        }
-
-        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            JobModule.RecoverBadJobs();
-            Console.WriteLine("Recovering Jobs...");
+            var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
+            Environment.ExitCode = exitCode;
         }
     }
 }
