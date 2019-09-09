@@ -21,6 +21,8 @@ namespace BatchProcessorServerUI.ViewModel
         public ButtonCommand Save { get; private set; }
         public ButtonCommand Load { get; private set; }
 
+        public ButtonCommand CheckStatus { get; private set; }
+
         public BatchProcessorState State { get; set; }
 
         public BatchProcessorViewModel()
@@ -67,9 +69,16 @@ namespace BatchProcessorServerUI.ViewModel
                 RunProcess("stop", true);
             });
 
+            CheckStatus = new ButtonCommand(() =>
+            {
+                State.ConsoleText += System.Environment.NewLine + $"Launching http://localhost:{State.Port}..." + System.Environment.NewLine;
+
+                Process.Start($"http://localhost:{State.Port}");
+            });
+
             Save = new ButtonCommand(() =>
             {
-                State.ConsoleText = "Saving Config, Restarting BatchProcessorServer Service..." + System.Environment.NewLine;
+                State.ConsoleText += "Saving Config, Restarting BatchProcessorServer Service..." + System.Environment.NewLine;
 
                 State.Save();
 

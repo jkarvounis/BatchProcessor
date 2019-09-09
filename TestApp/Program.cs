@@ -9,7 +9,7 @@ namespace TestApp
 {
     class Program
     {
-        private readonly static string SERVER_IP = "192.168.0.106";
+        private readonly static string SERVER_IP = "localhost";
         private readonly static int SERVER_PORT = 1200;
 
         static object locker = new object();

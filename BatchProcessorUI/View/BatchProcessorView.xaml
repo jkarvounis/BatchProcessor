@@ -26,6 +26,7 @@
                 <Button Content="Uninstall Service" Command="{Binding Uninstall}" Margin="5"/>
                 <Button Content="Start Service" Command="{Binding StartService}" Margin="5"/>
                 <Button Content="Stop Service" Command="{Binding StopService}" Margin="5"/>
+                <Button Content="Check Status" Command="{Binding CheckStatus}" Margin="5"/>
             </StackPanel>
         </Border>
 
