@@ -1,5 +1,5 @@
 ﻿﻿@Each
-ID: @Current.ID <br/>
+Name: @Current.Name <br/>
 Count: @Current.Count <br/>
 Current: @Current.Current <br/>
 Load: @Current.Load <br/>

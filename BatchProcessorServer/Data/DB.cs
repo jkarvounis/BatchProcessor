@@ -51,7 +51,7 @@ namespace BatchProcessorServer.Data
             return job;
         }
 
-        public static async Task AddWorkerCount(dynamic workerID, dynamic slotCount)
+        public static async Task AddWorkerCount(Guid workerID, int slotCount, string name)
         {
             await locker.WaitAsync();
 
@@ -59,6 +59,7 @@ namespace BatchProcessorServer.Data
                 workers.Add(workerID, new WorkerInfo(workerID));
             
             workers[workerID].Slots = slotCount;
+            workers[workerID].Name = name;
 
             locker.Release();
         }
@@ -68,7 +69,13 @@ namespace BatchProcessorServer.Data
             locker.Wait();
             List<WorkerModel> count = new List<WorkerModel>();
             foreach (var pair in workers)
-                count.Add(new WorkerModel() { ID = pair.Value.ID, Count = pair.Value.Slots, Current = pair.Value.JobList.Count });
+                count.Add(new WorkerModel()
+                {
+                    ID = pair.Value.ID,
+                    Name = pair.Value.Name,
+                    Count = pair.Value.Slots,
+                    Current = pair.Value.JobList.Count
+                });
             locker.Release();
             return count;
         }

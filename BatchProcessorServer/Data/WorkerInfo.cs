@@ -9,12 +9,14 @@ namespace BatchProcessorServer.Data
     public class WorkerInfo
     {
         public Guid ID { get; set; }
+        public String Name { get; set; }
         public int Slots { get; set; }
         public Dictionary<Guid, JobItem> JobList { get; set; }
 
         public WorkerInfo(Guid id)
         {
             ID = id;
+            Name = "Not Set";
             Slots = 1;
             JobList = new Dictionary<Guid, JobItem>();
         }

@@ -73,6 +73,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Topshelf, Version=4.2.1.215, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
       <HintPath>..\packages\Topshelf.4.2.1\lib\net452\Topshelf.dll</HintPath>

@@ -66,7 +66,8 @@ namespace BatchProcessor.Jobs
         {
             try
             {
-                var request = new RestRequest($"register/{workerID}/{modules.Count}");
+                string name = System.Web.HttpUtility.UrlEncode(Environment.MachineName);
+                var request = new RestRequest($"register/{workerID}/{modules.Count}/{name}");
                 var response = client.Put(request);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     return true;
