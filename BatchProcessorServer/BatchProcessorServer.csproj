@@ -80,7 +80,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Data\DB.cs" />
+    <Compile Include="Data\JobItem.cs" />
+    <Compile Include="Data\WorkerInfo.cs" />
     <Compile Include="Models\StatusModel.cs" />
+    <Compile Include="Models\WorkerModel.cs" />
     <Compile Include="Modules\IndexModule.cs" />
     <Compile Include="Modules\JobModule.cs" />
     <Compile Include="Modules\PayloadModule.cs" />
@@ -95,7 +99,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <EmbeddedResource Include="logo.ico" />
+    <EmbeddedResource Include="..\Scripts\resources\logo.ico">
+      <Link>logo.ico</Link>
+    </EmbeddedResource>
     <Content Include="Properties\icon.png" />
     <Content Include="Views\index.sshtml">
       <SubType>Designer</SubType>

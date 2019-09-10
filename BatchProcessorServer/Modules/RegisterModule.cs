@@ -1,18 +1,15 @@
-﻿using Nancy;
-using System;
-using System.Collections.Concurrent;
+﻿using BatchProcessorServer.Data;
+using Nancy;
 
 namespace BatchProcessorServer.Modules
 {
     public class RegisterModule : NancyModule
-    {
-        public static ConcurrentDictionary<Guid, int> Workers = new ConcurrentDictionary<Guid, int>();        
-
+    {        
         public RegisterModule() : base("/register")
         {
-            Put("/{workerID}/{slotCount}", parameters =>
+            Put("/{workerID}/{slotCount}", async parameters =>
             {
-                Workers.TryAdd(parameters.workerID, parameters.slotCount);
+                await DB.AddWorkerCount(parameters.workerID, parameters.slotCount);
                 return HttpStatusCode.OK;
             });
 

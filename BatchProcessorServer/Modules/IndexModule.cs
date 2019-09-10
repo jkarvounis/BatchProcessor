@@ -1,8 +1,8 @@
 ﻿using BatchProcessorServer.Models;
 using Nancy;
 using System.Linq;
-using System.Collections.Generic;
 using BatchProcessorServer.Util;
+using BatchProcessorServer.Data;
 
 namespace BatchProcessorServer.Modules
 {
@@ -12,24 +12,9 @@ namespace BatchProcessorServer.Modules
         {
             Get("/", parameters =>
             {
-                var workerLoad = JobModule.WorkerCounts();
-                int queueCount = JobModule.QueueCount();
-
-                List<StatusModel.WorkerModel> workers = new List<StatusModel.WorkerModel>();
-                foreach (var workerPair in workerLoad)
-                {
-                    int count = -1;
-                    if (!RegisterModule.Workers.TryGetValue(workerPair.Key, out count))
-                        count = -1;
-
-                    workers.Add(new StatusModel.WorkerModel()
-                    {
-                        ID = workerPair.Key,
-                        Count = count,
-                        Current = workerPair.Value
-                    });
-                }
-
+                var workers = DB.GetWorkerInfo();
+                int queueCount = DB.QueueCount();
+                
                 int payloads = System.IO.Directory.EnumerateFiles(Paths.TEMP_DIR).Count();
 
                 StatusModel model = new StatusModel(workers, queueCount, payloads);

@@ -1,4 +1,4 @@
-﻿using BatchProcessorServer.Modules;
+﻿using BatchProcessorServer.Data;
 using BatchProcessorServer.Util;
 using Nancy.Hosting.Self;
 using Newtonsoft.Json;
@@ -88,12 +88,12 @@ namespace BatchProcessorServer
                 host.Stop();
                 host.Dispose();
                 host = null;
-            }            
+            }
         }
 
         private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            JobModule.RecoverBadJobs();
+            DB.RecoverBadJobs();
         }
     }
 }

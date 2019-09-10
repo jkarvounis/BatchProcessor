@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BatchProcessorServer.Models
 {
     public class StatusModel
     {
-        public class WorkerModel
-        {
-            public Guid ID { get; set; }
-            public int Count { get; set; }
-            public int Current { get; set; }
-            public float Load => ((float)Current / (float)Count);
-        }
-
         public List<WorkerModel> Workers { get; set; }
         public int QueueSize { get; set; }
         public int PayloadCount { get; set; }
