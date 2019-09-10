@@ -60,6 +60,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Jobs\JobExecutor.cs" />
     <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Jobs\JobModule.cs" />

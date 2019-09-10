@@ -62,6 +62,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Model\BatchProcessorState.cs" />
     <Compile Include="Util\ButtonCommand.cs" />
     <Compile Include="Util\ModelBase.cs" />

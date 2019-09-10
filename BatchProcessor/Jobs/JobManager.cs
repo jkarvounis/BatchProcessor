@@ -21,6 +21,8 @@ namespace BatchProcessor.Jobs
             client = new RestClient(serverUri)
                 .UseSerializer(() => new JsonNetSerializer());
 
+
+
             workerID = Guid.NewGuid();
             Console.WriteLine($"WorkerID = {workerID}");
 
