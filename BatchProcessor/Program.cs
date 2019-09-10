@@ -15,6 +15,7 @@ namespace BatchProcessor
                     s.WhenStarted(server => server.Start());
                     s.WhenStopped(server => server.Stop());
                 });
+                x.StartAutomatically();
                 x.RunAsNetworkService();
 
                 x.SetDescription("Batch Processor Service for running .NET jobs from remote clients");

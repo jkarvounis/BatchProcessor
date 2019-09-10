@@ -7,7 +7,7 @@ using System.IO;
 
 namespace BatchProcessorServer
 {
-    public class Server
+    public class Server : NancyHost
     {
         public class Settings
         {
@@ -43,7 +43,6 @@ namespace BatchProcessorServer
         }
 
         Settings settings = null;
-        NancyHost host = null;
         System.Timers.Timer timer = null;
 
         public Server()
@@ -54,40 +53,30 @@ namespace BatchProcessorServer
             Console.WriteLine($"Loaded Settings: {settings}");
         }
 
-        public void Start()
+        public new void Start()
         {
             Console.WriteLine("Server Started");
-
-            settings = Settings.Load(Paths.SETTINGS_FILE);
-            Console.WriteLine($"Loaded Settings: {settings}");
-
+            
             Paths.CleanupTemp();
 
-            var uri = new Uri($"http://localhost:{settings.Port}");
-            host = new NancyHost(uri);
-            host.Start();
+            base.Start();
 
             timer = new System.Timers.Timer(2 * settings.HeartbeatMs);                
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
         }
 
-        public void Stop()
+        public new void Stop()
         {
             Console.WriteLine("Server Stopped");
+
+            base.Stop();
 
             if (timer != null)
             {
                 timer.Stop();
                 timer.Dispose();
                 timer = null;
-            }
-
-            if (host != null)
-            {
-                host.Stop();
-                host.Dispose();
-                host = null;
             }
         }
 

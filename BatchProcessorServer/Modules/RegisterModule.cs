@@ -16,6 +16,7 @@ namespace BatchProcessorServer.Modules
 
             Get("/upgrade/{version}", parameters =>
             {
+                
                 return HttpStatusCode.NoContent;
             });
         }

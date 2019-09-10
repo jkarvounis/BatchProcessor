@@ -1,5 +1,8 @@
-﻿using System;
+﻿using BatchProcessorServer.Util;
+using System;
 using Topshelf;
+using Topshelf.Nancy;
+using Nancy.Hosting.Self;
 
 namespace BatchProcessorServer
 {
@@ -14,7 +17,14 @@ namespace BatchProcessorServer
                     s.ConstructUsing(name => new Server());
                     s.WhenStarted(server => server.Start());
                     s.WhenStopped(server => server.Stop());
+                    s.WithNancyEndpoint(x, c =>
+                    {
+                        Server.Settings settings = Server.Settings.Load(Paths.SETTINGS_FILE);
+                        c.AddHost(port: settings.Port);
+                        c.UseBootstrapper(new Bootstrapper());
+                    });
                 });
+                x.StartAutomatically();
                 x.RunAsNetworkService();
 
                 x.SetDescription("Batch Processor Server Service for running .NET jobs from remote clients");

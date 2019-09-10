@@ -9,8 +9,8 @@
 ; General Configuration                                                        ;
 ;------------------------------------------------------------------------------;
 
-!define PRODUCT_NAME_DISPLAY        "Batch Processor"
-!define PRODUCT_NAME                "Batch Processor"
+!define PRODUCT_NAME_DISPLAY        "Batch Processor Server"
+!define PRODUCT_NAME                "Batch Processor Server"
 !define PRODUCT_PUBLISHER_DISPLAY   "John Karvounis"
 !define PRODUCT_PUBLISHER           "Karvounis"
 !define PRODUCT_WEB_SITE            "https://github.com/jkarvounis/BatchProcessor"
@@ -21,7 +21,7 @@
 
 !define HIGH_DPI_ROOT_KEY           "HKLM"
 
-!define PRODUCT_EXE                 "BatchProcessorUI.exe"
+!define PRODUCT_EXE                 "BatchProcessorServerUI.exe"
 
 ;------------------------------------------------------------------------------;
 ; Compression                                                                  ;
@@ -127,17 +127,24 @@ FunctionEnd
 Section "MainSection" MainSection
 
     SetOverwrite on
+   
+    !define BinDirectory  "..\BatchProcessorServerUI\bin\Release\"
 
-    SetOutPath "$INSTDIR"
-
-    !define BinDirectory  "..\BatchProcessorUI\bin\Release\"
-
-    File "${BinDirectory}\BatchProcessor.exe"
-	File "${BinDirectory}\BatchProcessor.exe.config"
-    File "${BinDirectory}\BatchProcessorAPI.dll"
-    File "${BinDirectory}\BatchProcessorUI.exe"
-    File "${BinDirectory}\Newtonsoft.Json.dll"
-	File "${BinDirectory}\RestSharp.dll"
+	SetOutPath "$INSTDIR\Content"
+	File "${BinDirectory}\Content\nancy-logo.png"
+	
+	SetOutPath "$INSTDIR\Views"
+	File "${BinDirectory}\Views\index.sshtml"
+	File "${BinDirectory}\Views\workers.sshtml"
+	
+	SetOutPath "$INSTDIR"
+    File "${BinDirectory}\BatchProcessorServer.exe"
+	File "${BinDirectory}\BatchProcessorServer.exe.config"
+	File "${BinDirectory}\BatchProcessorServerUI.exe"
+    File "${BinDirectory}\BatchProcessorAPI.dll"    
+	File "${BinDirectory}\Nancy.dll"
+	File "${BinDirectory}\Nancy.Hosting.Self.dll"
+    File "${BinDirectory}\Newtonsoft.Json.dll"	
     File "${BinDirectory}\System.Data.Common.dll"
     File "${BinDirectory}\System.Diagnostics.StackTrace.dll"
     File "${BinDirectory}\System.Diagnostics.Tracing.dll"
@@ -151,12 +158,13 @@ Section "MainSection" MainSection
     File "${BinDirectory}\System.Threading.Overlapped.dll"
 	File "${BinDirectory}\System.Xml.XPath.XDocument.dll"
     File "${BinDirectory}\Topshelf.dll"	
+	File "${BinDirectory}\Topshelf.Nancy.dll"	
 
     ; Create Uninstaller
     WriteUninstaller "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
 	
 	; Add firewall rule
-	nsExec::Exec '"netsh" advfirewall firewall add rule name="${PRODUCT_NAME}" dir=in action=allow program="$INSTDIR\BatchProcessor.exe"'        
+	nsExec::Exec '"netsh" advfirewall firewall add rule name="${PRODUCT_NAME}" dir=in action=allow program="$INSTDIR\BatchProcessorServer.exe"'        
 
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"    "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName"        "${PRODUCT_NAME_DISPLAY}"
@@ -171,8 +179,8 @@ Section "MainSection" MainSection
 	CreateShortCut  "$STARTMENU\Programs\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"              "$INSTDIR\Uninstall ${PRODUCT_NAME}.exe"
 
 	;Add service
-	nsExec::Exec "$INSTDIR\BatchProcessor.exe install"
-	nsExec::Exec "$INSTDIR\BatchProcessor.exe start"
+	nsExec::Exec "$INSTDIR\BatchProcessorServer.exe install"
+	nsExec::Exec "$INSTDIR\BatchProcessorServer.exe start"
 	
 SectionEnd
 
@@ -191,8 +199,8 @@ FunctionEnd
 Section "Uninstall"
 
 	; Remove the service if possible
-	nsExec::Exec "$INSTDIR\BatchProcessor.exe stop"
-	nsExec::Exec "$INSTDIR\BatchProcessor.exe uninstall"
+	nsExec::Exec "$INSTDIR\BatchProcessorServer.exe stop"
+	nsExec::Exec "$INSTDIR\BatchProcessorServer.exe uninstall"
 	
 	; Remove firewall rule
 	nsExec::Exec '"netsh" advfirewall firewall delete  rule name="${PRODUCT_NAME}"'  
