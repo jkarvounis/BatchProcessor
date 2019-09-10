@@ -1,9 +1,7 @@
-﻿using BatchProcessorAPI;
-using BatchProcessorServer.Models;
+﻿using BatchProcessorServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,15 +49,14 @@ namespace BatchProcessorServer.Data
             return job;
         }
 
-        public static async Task AddWorkerCount(Guid workerID, int slotCount, string name)
+        public static async Task RegisterWorkerAsync(Guid workerID, int slotCount, string name)
         {
             await locker.WaitAsync();
 
             if (!workers.ContainsKey(workerID))
                 workers.Add(workerID, new WorkerInfo(workerID));
-            
-            workers[workerID].Slots = slotCount;
-            workers[workerID].Name = name;
+
+            workers[workerID].SetRegistrationInfo(slotCount, name);
 
             locker.Release();
         }
@@ -129,10 +126,11 @@ namespace BatchProcessorServer.Data
             DateTime threshold = DateTime.UtcNow - TimeSpan.FromSeconds(10);
             foreach (var workerID in workers.Keys.ToList())
             {
+                bool removeWorker = workers[workerID].RegistrationTime < threshold;
                 var list = workers[workerID].JobList.Values.ToList();
                 foreach (var job in list)
                 {
-                    if (job.heartbeat.GetValueOrDefault(DateTime.MinValue) < threshold)
+                    if (removeWorker || job.heartbeat.GetValueOrDefault(DateTime.MinValue) < threshold)
                     {
                         workers[workerID].JobList.Remove(job.job.ID);
                         job.workerID = null;
@@ -140,6 +138,9 @@ namespace BatchProcessorServer.Data
                         jobQueue.Enqueue(job);
                     }
                 }
+
+                if (removeWorker)
+                    workers.Remove(workerID);
             }
             locker.Release();
         }

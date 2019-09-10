@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BatchProcessorServer.Data
 {
     public class WorkerInfo
     {
-        public Guid ID { get; set; }
-        public String Name { get; set; }
-        public int Slots { get; set; }
-        public Dictionary<Guid, JobItem> JobList { get; set; }
+        public Guid ID { get; private set; }
+        public string Name { get; private set; }
+        public int Slots { get; private set; }
+        public Dictionary<Guid, JobItem> JobList { get; private set; }
+        public DateTime RegistrationTime { get; private set; }
 
         public WorkerInfo(Guid id)
         {
@@ -19,11 +17,19 @@ namespace BatchProcessorServer.Data
             Name = "Not Set";
             Slots = 1;
             JobList = new Dictionary<Guid, JobItem>();
+            RegistrationTime = DateTime.Now;
         }
 
         public void AddJobItem(JobItem job)
         {
             JobList.Add(job.job.ID, job);
+        }
+
+        public void SetRegistrationInfo(int slots, string name)
+        {
+            Slots = slots;
+            Name = name;
+            RegistrationTime = DateTime.Now;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace BatchProcessorServer.Modules
             Put("/{workerID}/{slotCount}/{name}", async parameters =>
             {
                 string workerName = System.Web.HttpUtility.UrlDecode(parameters.name);
-                await DB.AddWorkerCount(parameters.workerID, parameters.slotCount, workerName);
+                await DB.RegisterWorkerAsync(parameters.workerID, parameters.slotCount, workerName);
                 return HttpStatusCode.OK;
             });
 
