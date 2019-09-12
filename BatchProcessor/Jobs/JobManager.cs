@@ -80,7 +80,7 @@ namespace BatchProcessor.Jobs
         {            
             try
             {                
-                var request = new RestRequest($"register/upgrade/1.{version}");
+                var request = new RestRequest($"register/upgrade/{version}");
                 var response = client.Get(request);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
