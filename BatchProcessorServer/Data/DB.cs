@@ -120,10 +120,10 @@ namespace BatchProcessorServer.Data
             return jobItem;
         }
 
-        public static void RecoverBadJobs()
+        public static void RecoverBadJobs(int heartbeatMs)
         {
             locker.Wait();
-            DateTime threshold = DateTime.UtcNow - TimeSpan.FromSeconds(10);
+            DateTime threshold = DateTime.UtcNow - TimeSpan.FromMilliseconds(2 * heartbeatMs);
             foreach (var workerID in workers.Keys.ToList())
             {
                 bool removeWorker = workers[workerID].RegistrationTime < threshold;

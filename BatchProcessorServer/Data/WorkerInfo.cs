@@ -17,7 +17,7 @@ namespace BatchProcessorServer.Data
             Name = "Not Set";
             Slots = 1;
             JobList = new Dictionary<Guid, JobItem>();
-            RegistrationTime = DateTime.Now;
+            RegistrationTime = DateTime.UtcNow;
         }
 
         public void AddJobItem(JobItem job)
@@ -29,7 +29,7 @@ namespace BatchProcessorServer.Data
         {
             Slots = slots;
             Name = name;
-            RegistrationTime = DateTime.Now;
+            RegistrationTime = DateTime.UtcNow;
         }
     }
 }

@@ -7,6 +7,8 @@ namespace BatchProcessor.Jobs
 {
     public class JobModule : IDisposable
     {
+        private static readonly int THREAD_SLEEP_MS = 5000;
+
         IRestClient client;
         Guid workerID;
         int threadID;
@@ -51,7 +53,7 @@ namespace BatchProcessor.Jobs
                 Job job = FetchJob();
                 if (job == null)
                 {
-                    Thread.Sleep(5000);
+                    Thread.Sleep(THREAD_SLEEP_MS);
                     continue;
                 }
 
@@ -67,7 +69,7 @@ namespace BatchProcessor.Jobs
                     {
                         Console.WriteLine("FAILED TO GET PAYLOAD");
                         currentJobID = null;                        
-                        Thread.Sleep(5000);
+                        Thread.Sleep(THREAD_SLEEP_MS);
                         continue;
                     }
                 }

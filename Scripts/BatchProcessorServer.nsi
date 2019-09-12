@@ -66,7 +66,7 @@ SetCompressor /SOLID lzma
 ;------------------------------------------------------------------------------;
 
 Name                        "${PRODUCT_NAME_DISPLAY}"
-OutFile                     "${PRODUCT_NAME} Setup.exe"
+OutFile                     "..\Downloads\${PRODUCT_NAME} Setup ${PRODUCT_DISPLAY_VERSION}.exe"
 InstallDir                  "$PROGRAMFILES\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
 ShowInstDetails             nevershow
 ShowUnInstDetails           nevershow
@@ -132,6 +132,7 @@ Section "MainSection" MainSection
 
 	SetOutPath "$INSTDIR\Content"
 	File "${BinDirectory}\Content\nancy-logo.png"
+	File "..\Downloads\Batch Processor Setup ${PRODUCT_DISPLAY_VERSION}.exe";
 	
 	SetOutPath "$INSTDIR\Views"
 	File "${BinDirectory}\Views\index.sshtml"

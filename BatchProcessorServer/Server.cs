@@ -80,9 +80,9 @@ namespace BatchProcessorServer
             }
         }
 
-        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            DB.RecoverBadJobs();
+            DB.RecoverBadJobs(settings.HeartbeatMs);
         }
     }
 }
