@@ -14,7 +14,7 @@
 !define PRODUCT_PUBLISHER_DISPLAY   "John Karvounis"
 !define PRODUCT_PUBLISHER           "Karvounis"
 !define PRODUCT_WEB_SITE            "https://github.com/jkarvounis/BatchProcessor"
-!define PRODUCT_DISPLAY_VERSION		"2.0.0.0"
+!define PRODUCT_DISPLAY_VERSION		"2.0.2.0"
 
 !define PRODUCT_UNINST_ROOT_KEY     "HKLM"
 !define PRODUCT_UNINST_KEY          "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

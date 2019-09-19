@@ -3,6 +3,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace BatchProcessorAPI
@@ -20,8 +21,10 @@ namespace BatchProcessorAPI
         /// </summary>
         /// <param name="serverHostname">Hostname of the server</param>
         /// <param name="tcpPort">TCP port of the server</param>
-        public JobScheduler(string serverHostname, int tcpPort)
+        /// <param name="maxConcurrent">Maximum concurrent jobs [Default 256]</param>
+        public JobScheduler(string serverHostname, int tcpPort, int maxConcurrent = 256)
         {
+            ServicePointManager.DefaultConnectionLimit = maxConcurrent;            
             client = new RestClient($"http://{serverHostname}:{tcpPort}")
                 .UseSerializer(() => new JsonNetSerializer());
             payloadID = null;

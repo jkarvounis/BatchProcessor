@@ -3,14 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace TestApp
 {
     class Program
     {
-        private readonly static string SERVER_IP = "localhost";
+        private readonly static string SERVER_IP = "cluster.lan";
         private readonly static int SERVER_PORT = 1200;
+
+        private readonly static int MAX_PARALLEL = 100;
+        private readonly static int PROCESS_DELAY_MS = 1000;
 
         static object locker = new object();
 
@@ -23,6 +25,8 @@ namespace TestApp
                 // Console Output is reported back
                 Console.WriteLine("Test App - Got arg: " + String.Join(", ", args));
 
+                System.Threading.Thread.Sleep(PROCESS_DELAY_MS);
+
                 // A single select output file is reported back
                 File.WriteAllText("output.txt", "Test App File Contents " + String.Join(", ", args));
             }
@@ -31,16 +35,16 @@ namespace TestApp
                 // Main entry to handle requesting jobs
                 Console.WriteLine("Test App");                
 
-                // Create 100 sample jobs
+                // Create 20 sample jobs
                 // Command must be and executable in the contents of the payload
                 // Output file is optional but must be a locally reported file after executing the command
                 // Arguments are optional
                 List<Job> jobs = new List<Job>();
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < MAX_PARALLEL; i++)
                     jobs.Add(new Job($"Job-{i}", "TestApp.exe", i.ToString(), "output.txt"));
 
                 // Create Job Scheduler, point to server IP and port
-                JobScheduler scheduler = new JobScheduler(SERVER_IP, SERVER_PORT);
+                JobScheduler scheduler = new JobScheduler(SERVER_IP, SERVER_PORT, MAX_PARALLEL);
 
                 // Convert current working directory into payload for job execution                
                 string payloadFile = PayloadUtil.CreatePayloadFileWithWorkingDirectory();

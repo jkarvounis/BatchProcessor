@@ -9,61 +9,66 @@ namespace BatchProcessorServer.Data
 {
     public static class DB
     {
-        private static SemaphoreSlim locker = new SemaphoreSlim(1);        
-
+        private static SemaphoreSlim jobLocker = new SemaphoreSlim(1);        
         private static Queue<JobItem> jobQueue = new Queue<JobItem>();
+
+        private static SemaphoreSlim workerLocker = new SemaphoreSlim(1);
         private static Dictionary<Guid, WorkerInfo> workers = new Dictionary<Guid, WorkerInfo>();
 
         public static int QueueCount()
         {
-            locker.Wait();
+            jobLocker.Wait();
             int count = jobQueue.Count;
-            locker.Release();
+            jobLocker.Release();
             return count;
         }
 
         public static async Task QueueJobItemAsync(JobItem jobItem)
         {
-            await locker.WaitAsync();
+            await jobLocker.WaitAsync();
             jobQueue.Enqueue(jobItem);
-            locker.Release();
+            jobLocker.Release();
         }
 
         public static async Task<JobItem> DeqeueueJobItemAsync(Guid workerID)
         {
-            await locker.WaitAsync();
+            await jobLocker.WaitAsync();
             if (jobQueue.Count == 0)
             {
-                locker.Release();
+                jobLocker.Release();
                 return null;
             }
 
             JobItem job = jobQueue.Dequeue();
+            jobLocker.Release();
+
             job.heartbeat = DateTime.UtcNow;
             job.workerID = workerID;
+
+            await workerLocker.WaitAsync();
             if (!workers.ContainsKey(workerID))
                 workers.Add(workerID, new WorkerInfo(workerID));
             workers[workerID].AddJobItem(job);
+            workerLocker.Release();
 
-            locker.Release();
             return job;
         }
 
         public static async Task RegisterWorkerAsync(Guid workerID, int slotCount, string name)
         {
-            await locker.WaitAsync();
+            await workerLocker.WaitAsync();
 
             if (!workers.ContainsKey(workerID))
                 workers.Add(workerID, new WorkerInfo(workerID));
 
             workers[workerID].SetRegistrationInfo(slotCount, name);
 
-            locker.Release();
+            workerLocker.Release();
         }
 
         public static List<WorkerModel> GetWorkerInfo()
         {
-            locker.Wait();
+            workerLocker.Wait();
             List<WorkerModel> count = new List<WorkerModel>();
             foreach (var pair in workers)
                 count.Add(new WorkerModel()
@@ -73,56 +78,56 @@ namespace BatchProcessorServer.Data
                     Count = pair.Value.Slots,
                     Current = pair.Value.JobList.Count
                 });
-            locker.Release();
+            workerLocker.Release();
             return count;
         }
 
         public static async Task<bool> StoreHeartbeat(Guid workerID, Guid jobID)
         {
-            await locker.WaitAsync();
+            await workerLocker.WaitAsync();
             if (!workers.ContainsKey(workerID))
             {
-                locker.Release();
+                workerLocker.Release();
                 return false;
             }
 
             if (!workers[workerID].JobList.ContainsKey(jobID))
             {
-                locker.Release();
+                workerLocker.Release();
                 return false;
             }
 
             workers[workerID].JobList[jobID].heartbeat = DateTime.UtcNow;
-            locker.Release();
+            workerLocker.Release();
 
             return true;
         }
 
         public static async Task<JobItem> RemoveJobForResponse(Guid workerID, Guid jobID)
         {
-            await locker.WaitAsync();
+            await workerLocker.WaitAsync();
             if (!workers.ContainsKey(workerID))
             {
-                locker.Release();
+                workerLocker.Release();
                 return null;
             }
 
             if (!workers[workerID].JobList.ContainsKey(jobID))
             {
-                locker.Release();
+                workerLocker.Release();
                 return null;
             }
 
             JobItem jobItem = workers[workerID].JobList[jobID];
             workers[workerID].JobList.Remove(jobID);
-            locker.Release();
+            workerLocker.Release();
 
             return jobItem;
         }
 
         public static void RecoverBadJobs(int heartbeatMs)
         {
-            locker.Wait();
+            workerLocker.Wait();
             DateTime threshold = DateTime.UtcNow - TimeSpan.FromMilliseconds(2 * heartbeatMs);
             foreach (var workerID in workers.Keys.ToList())
             {
@@ -135,14 +140,17 @@ namespace BatchProcessorServer.Data
                         workers[workerID].JobList.Remove(job.job.ID);
                         job.workerID = null;
                         job.heartbeat = null;
+
+                        jobLocker.Wait();
                         jobQueue.Enqueue(job);
+                        jobLocker.Release();
                     }
                 }
 
                 if (removeWorker)
                     workers.Remove(workerID);
             }
-            locker.Release();
+            workerLocker.Release();
         }
     }
 }

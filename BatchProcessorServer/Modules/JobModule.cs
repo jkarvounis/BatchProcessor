@@ -24,10 +24,10 @@ namespace BatchProcessorServer.Modules
                 JobItem jobItem = await DB.DeqeueueJobItemAsync(parameters.workerID);
                 if (jobItem == null)
                     return HttpStatusCode.NoContent;
-                return jobItem;
+                return jobItem.job;
             });
 
-            Put("/{jobID}/{workerID}/heatbeat", async parameters =>
+            Put("/{jobID}/{workerID}/heartbeat", async parameters =>
             {
                 bool success = await DB.StoreHeartbeat(parameters.workerID, parameters.jobID);
                 if (success)

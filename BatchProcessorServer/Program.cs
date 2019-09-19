@@ -19,7 +19,7 @@ namespace BatchProcessorServer
                     s.WhenStopped(server => server.Stop());
                     s.WithNancyEndpoint(x, c =>
                     {
-                        Server.Settings settings = Server.Settings.Load(Paths.SETTINGS_FILE);
+                        Server.Settings settings = Server.Settings.Load(Paths.SETTINGS_FILE);                        
                         c.AddHost(port: settings.Port);
                         c.UseBootstrapper(new Bootstrapper());
                     });
