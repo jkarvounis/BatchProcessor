@@ -145,6 +145,7 @@ Section "MainSection" MainSection
     File "${BinDirectory}\BatchProcessorAPI.dll"    
 	File "${BinDirectory}\Nancy.dll"
 	File "${BinDirectory}\Nancy.Hosting.Self.dll"
+	File "${BinDirectory}\Nancy.Serialization.JsonNet.dll"
     File "${BinDirectory}\Newtonsoft.Json.dll"	
     File "${BinDirectory}\System.Data.Common.dll"
     File "${BinDirectory}\System.Diagnostics.StackTrace.dll"

@@ -25,7 +25,7 @@ namespace BatchProcessorServer
                     });
                 });
                 x.StartAutomatically();
-                x.RunAsNetworkService();
+                x.RunAsLocalSystem();
 
                 x.SetDescription("Batch Processor Server Service for running .NET jobs from remote clients");
                 x.SetDisplayName("Batch Processor Server");
