@@ -8,7 +8,7 @@ namespace TestApp
 {
     class Program
     {
-        private readonly static string SERVER_IP = "cluster.lan";
+        private readonly static string SERVER_IP = "localhost";
         private readonly static int SERVER_PORT = 1200;
 
         private readonly static int MAX_PARALLEL = 100;
