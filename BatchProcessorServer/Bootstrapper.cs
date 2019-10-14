@@ -1,4 +1,5 @@
 ﻿using Nancy;
+using Nancy.Conventions;
 using System.IO;
 
 namespace BatchProcessorServer
@@ -24,6 +25,14 @@ namespace BatchProcessorServer
                 resourceStream.CopyTo(memoryStream);
                 return memoryStream.GetBuffer();
             }
+        }
+
+        protected override void ConfigureConventions(NancyConventions nancyConventions)
+        {
+            base.ConfigureConventions(nancyConventions);
+
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("css", @"Content/css"));
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("js", @"Content/js"));
         }
     }
 }

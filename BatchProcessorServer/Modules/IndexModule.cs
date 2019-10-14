@@ -10,21 +10,36 @@ namespace BatchProcessorServer.Modules
 {
     public class IndexModule : NancyModule
     {
+        static System.Collections.Generic.Dictionary<long, int> status = new System.Collections.Generic.Dictionary<long, int>();
+
         public IndexModule()
         {
             Get("/", parameters =>
             {
                 var workers = DB.GetWorkerInfo();
+                var chartData = DB.GetChartData();
                 int queueCount = DB.QueueCount();
-                
-                int payloads = System.IO.Directory.EnumerateFiles(Paths.TEMP_DIR).Count();
+                int payloads = DB.GetPayloadCount();
 
-                StatusModel model = new StatusModel(workers, queueCount, payloads);
+                StatusModel model = new StatusModel(workers, chartData, queueCount, payloads);
 
-                return View["index", model];
+                var outputView = View["index", model];
+                return outputView;
             });
 
-            Get("/setup.exe", parameters =>
+            Get("/update/status", parameters =>
+            {
+                var workers = DB.GetWorkerInfo();
+                var chartData = DB.GetChartData();
+                int queueCount = DB.QueueCount();
+                int payloads = DB.GetPayloadCount();
+
+                StatusModel model = new StatusModel(workers, chartData, queueCount, payloads);
+
+                return model;
+            });
+
+            Get("/download/setup.exe", parameters =>
             {
                 if (File.Exists(Paths.INSTALLER))
                 {
@@ -32,6 +47,12 @@ namespace BatchProcessorServer.Modules
                 }
 
                 return HttpStatusCode.NotFound;
+            });
+                                    
+            Get("/reset", parameters =>
+            {
+                DB.Reset();
+                return new RedirectResponse("/");
             });
         }
     }

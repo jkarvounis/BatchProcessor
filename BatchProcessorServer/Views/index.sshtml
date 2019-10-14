@@ -1,36 +1,117 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="5" >
-    <title>BatchProcessorServer</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<style type="text/css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="@Path['~/Content/css/bootstrap.min.css']" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-		body {
-			text-align: center;
-		}
+    <title>Batch Processor Server</title>
 
-	</style>
-
+    <!-- Custom styles -->
+    <link href="@Path['~/css/style.css']" rel="stylesheet">
 </head>
-<body>
-	<img src="@Path['~/Content/nancy-logo.png']" alt="Nancy logo" /><br />
-	
-    <h3>Status</h3>
-    <div id ="status">
-        <p>Uploaded Payloads: @Model.PayloadCount</p>
-        <p>Job Queue: @Model.QueueSize</p>
-        <p>Workers: @Model.TotalWorkers</p>
-        <p>Slots: @Model.TotalCount</p>
-        <p>Current Jobs: @Model.TotalCurrent</p>
-        <p>Cluster Load: @Model.TotalLoad</p>
+
+<body>        
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="@Path['~/Content/nancy-logo.png']" width="90" height="90" class="d-inline-block align-center" alt="">
+            <span class="navbar-text">Batch<br/>Processor</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">                
+                <a class="btn btn-light navbar-btn" data-toggle="modal" data-target="#resetModal">Clear Queue</a>
+                <a class="btn btn-light navbar-btn" data-toggle="modal" data-target="#downloadModal">Download</a>
+            </div>
+        </div>
+    </nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron jumbotron-mod1">
+        <h2 class="title">Status</h2>
+        <div class="row justify-content-around">
+            <div class="col-auto"> 
+                <div id ="status" class="row justify-content-start outlined">
+                    <div class="col-auto">Payloads: <span id="payloadCount">@Model.PayloadCount</span></div>
+                    <div class="col-auto">Job Queue: <span id="queueCount">@Model.QueueSize</span></div>
+                    <div class="col-auto">Workers: <span id="workerCount">@Model.TotalWorkers</span></div>
+                    <div class="col-auto">Slots: <span id="totalCount">@Model.TotalCount</span></div>
+                    <div class="col-auto">Current Jobs: <span id="currentCount">@Model.TotalCurrent</span></div>
+                    <div class="col-auto">Cluster Load: <span id="currentLoad">@Model.TotalLoadFormatted</span></div>
+                </div>        
+            </div>
+        </div>
+        <div class="row justify-content-around">            
+            <div id ="graph" class="outlined col-12 md-auto">
+                <canvas id="myChart"></canvas>
+            </div>            
+        </div>      
     </div>
 
-    <h3>Workers</h3>
-    <div id ="workers">
-        @Partial['workers', Model.Workers];
+    <div class="jumbotron-mod1">
+        <h2 class="title">Workers</h2>
+        <div id="workers" class="d-flex flex-wrap justify-content-center">
+            @Partial['workers', Model.Workers];   
+        </div>
     </div>
+
+</main>
+
+<!-- Reset Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel" aria-hidden="true">    
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">                                        
+                 This will clear all pending jobs and currently uploaded payloads.  Are you sure you want to do this?
+            </div>
+            <div class="modal-footer">
+                <a type="button" class="btn btn-primary" href="reset">RESET</a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<!-- Download Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">    
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadModalLabel">Available Downloads</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">                                        
+                 <a href="/setup.exe">Batch Processor Worker Setup (@Model.Version)</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<script type="text/javascript" src="@Path['~/js/jquery-3.4.1.min.js']"></script>
+<script type="text/javascript" src="@Path['~/js/bootstrap.bundle.min.js']"></script>
+<script type="text/javascript" src="@Path['~/js/chart.bundle.min.js']"></script>
+<script type="text/javascript" src="@Path['~/js/status.js']"></script>
 
 </body>
 </html>

@@ -9,5 +9,6 @@ namespace BatchProcessorServer.Models
         public int Count { get; set; }
         public int Current { get; set; }
         public float Load => ((float)Current / (float)Count);
+        public string LoadFormatted => (Load * 100).ToString("###.#") + "%";
     }
 }

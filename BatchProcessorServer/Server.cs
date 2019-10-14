@@ -82,7 +82,7 @@ namespace BatchProcessorServer
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            DB.RecoverBadJobs(settings.HeartbeatMs);
+            DB.Update(settings.HeartbeatMs);
         }
     }
 }

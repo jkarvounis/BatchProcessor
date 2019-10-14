@@ -1,0 +1,50 @@
+﻿/* Move down content because we have a fixed navbar that is 3.5rem tall */
+.outlined {
+    margin-top: 10px;
+    padding: 30px;
+    outline: 2px solid #ccc;
+    outline-offset: -10px;
+    -moz-outline-radius: 10px;
+    -webkit-outline-radius: 10px;
+}
+
+.title {
+    text-align: center;
+}
+
+.jumbotron-mod1 {
+    margin: 30px;
+    padding: 30px;
+}
+
+.navbar-brand span {
+    font-size: 2rem;    
+    line-height: 1.2;
+    font-weight: 500;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 0 0 15px;
+}
+
+.modal {
+}
+
+.vertical-alignment-helper {
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+
+.vertical-align-center {
+    /* To center vertically */
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.modal-content {
+    /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+    width: inherit;
+    height: inherit;
+    /* To center horizontally */
+    margin: 120px;
+}
