@@ -14,7 +14,6 @@ namespace BatchProcessorServer.Modules
                 Job job = this.Bind<Job>();
                 JobItem jobItem = new JobItem(job);
                 await DB.QueueJobItemAsync(jobItem);
-
                 await jobItem.semaphore.WaitAsync();
                 return jobItem.response;
             });

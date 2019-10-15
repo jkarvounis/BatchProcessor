@@ -354,7 +354,7 @@ namespace BatchProcessorServer.Data
                 workers.Count);
 
             // Add new element and remove old keys
-            DateTimeOffset oldData = time - TimeSpan.FromHours(1);
+            DateTimeOffset oldData = time - TimeSpan.FromMinutes(30);
             chartLocker.Wait();
             chartData.Add(time, data);
 

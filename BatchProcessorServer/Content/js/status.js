@@ -72,7 +72,8 @@ var config = {
 				type: 'linear',
 				position: 'left',
                 scaleLabel: {
-                    display:     true
+                    display:     true,
+					labelString: 'Payloads / Workers'
                 },
 				ticks: {
 					beginAtZero: true,
@@ -83,7 +84,8 @@ var config = {
 				type: 'linear',
 				position: 'right',
                 scaleLabel: {
-                    display:     true
+                    display:     true,
+					labelString: 'Jobs / Slots'
                 },
 				ticks: {
 					beginAtZero: true,
@@ -91,6 +93,11 @@ var config = {
 				}
             }]
 		},
+		elements: {
+            point:{
+                radius: 0
+            }
+        },
 		responsiveAnimationDuration: 100,
 		maintainAspectRatio: true,
 		aspectRatio: 5

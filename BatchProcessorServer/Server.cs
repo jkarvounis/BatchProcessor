@@ -61,7 +61,7 @@ namespace BatchProcessorServer
 
             base.Start();
 
-            timer = new System.Timers.Timer(2 * settings.HeartbeatMs);                
+            timer = new System.Timers.Timer(settings.HeartbeatMs);                
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
         }
