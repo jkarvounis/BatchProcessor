@@ -10,8 +10,6 @@ namespace BatchProcessorServer.Modules
 {
     public class IndexModule : NancyModule
     {
-        static System.Collections.Generic.Dictionary<long, int> status = new System.Collections.Generic.Dictionary<long, int>();
-
         public IndexModule()
         {
             Get("/", parameters =>

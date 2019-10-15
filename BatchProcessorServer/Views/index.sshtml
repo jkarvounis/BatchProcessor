@@ -99,7 +99,7 @@
                 </button>
             </div>
             <div class="modal-body">                                        
-                 <a href="/setup.exe">Batch Processor Worker Setup (@Model.Version)</a>
+                 <a href="/download/setup.exe">Batch Processor Worker Setup (@Model.Version)</a>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

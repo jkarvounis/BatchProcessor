@@ -42,8 +42,8 @@ namespace BatchProcessorServer
             }
         }
 
-        Settings settings = null;
-        System.Timers.Timer timer = null;
+        readonly Settings settings;
+        System.Timers.Timer timer;
 
         public Server()
         {

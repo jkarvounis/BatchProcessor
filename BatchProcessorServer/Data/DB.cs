@@ -12,17 +12,17 @@ namespace BatchProcessorServer.Data
 {
     public static class DB
     {
-        private static SemaphoreSlim jobLocker = new SemaphoreSlim(1);        
-        private static Queue<JobItem> jobQueue = new Queue<JobItem>();
+        private static readonly SemaphoreSlim jobLocker = new SemaphoreSlim(1);        
+        private static readonly Queue<JobItem> jobQueue = new Queue<JobItem>();
 
-        private static SemaphoreSlim workerLocker = new SemaphoreSlim(1);
-        private static Dictionary<Guid, WorkerInfo> workers = new Dictionary<Guid, WorkerInfo>();
+        private static readonly SemaphoreSlim workerLocker = new SemaphoreSlim(1);
+        private static readonly Dictionary<Guid, WorkerInfo> workers = new Dictionary<Guid, WorkerInfo>();
 
-        private static SemaphoreSlim payloadLocker = new SemaphoreSlim(1);
-        private static Dictionary<Guid, DateTime> payloadAccess = new Dictionary<Guid, DateTime>();
+        private static readonly SemaphoreSlim payloadLocker = new SemaphoreSlim(1);
+        private static readonly Dictionary<Guid, DateTime> payloadAccess = new Dictionary<Guid, DateTime>();
 
-        private static SemaphoreSlim chartLocker = new SemaphoreSlim(1);
-        private static Dictionary<DateTimeOffset, ChartInfo> chartData = new Dictionary<DateTimeOffset, ChartInfo>();
+        private static readonly SemaphoreSlim chartLocker = new SemaphoreSlim(1);
+        private static readonly Dictionary<DateTimeOffset, ChartInfo> chartData = new Dictionary<DateTimeOffset, ChartInfo>();
 
         // Reset
 
@@ -34,11 +34,13 @@ namespace BatchProcessorServer.Data
 
             foreach (var job in jobQueue)
             {
-                job.response = new JobResponse();
-                job.response.ID = job.job.ID;
-                job.response.Name = job.job.Name;
-                job.response.Completed = false;
-                job.response.ConsoleError = "Job cancelled on server";
+                job.response = new JobResponse
+                {
+                    ID = job.job.ID,
+                    Name = job.job.Name,
+                    Completed = false,
+                    ConsoleError = "Job cancelled on server"
+                };
 
                 job.semaphore.Release();
             }
@@ -48,11 +50,13 @@ namespace BatchProcessorServer.Data
             {
                 foreach (var job in w.Value.JobList.Values)
                 {
-                    job.response = new JobResponse();
-                    job.response.ID = job.job.ID;
-                    job.response.Name = job.job.Name;
-                    job.response.Completed = false;
-                    job.response.ConsoleError = "Job cancelled on server";
+                    job.response = new JobResponse
+                    {
+                        ID = job.job.ID,
+                        Name = job.job.Name,
+                        Completed = false,
+                        ConsoleError = "Job cancelled on server"
+                    };
 
                     job.semaphore.Release();
                 }
@@ -287,7 +291,7 @@ namespace BatchProcessorServer.Data
         public static void Update(int heartbeatMs)
         {
             RecoverBadJobs(heartbeatMs);
-            RemoveStalePayloads(heartbeatMs);
+            RemoveStalePayloads();
             UpdateChartData();
         }
 
@@ -320,7 +324,7 @@ namespace BatchProcessorServer.Data
             workerLocker.Release();
         }
 
-        private static void RemoveStalePayloads(int heartbeatMs)
+        private static void RemoveStalePayloads()
         {
             payloadLocker.Wait();
 

@@ -14,7 +14,7 @@
 !define PRODUCT_PUBLISHER_DISPLAY   "John Karvounis"
 !define PRODUCT_PUBLISHER           "Karvounis"
 !define PRODUCT_WEB_SITE            "https://github.com/jkarvounis/BatchProcessor"
-!define PRODUCT_DISPLAY_VERSION		"2.0.2.0"
+!define PRODUCT_DISPLAY_VERSION		"2.1.0.0"
 
 !define PRODUCT_UNINST_ROOT_KEY     "HKLM"
 !define PRODUCT_UNINST_KEY          "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -133,6 +133,16 @@ Section "MainSection" MainSection
 	SetOutPath "$INSTDIR\Content"
 	File "${BinDirectory}\Content\nancy-logo.png"
 	File "..\Downloads\Batch Processor Setup ${PRODUCT_DISPLAY_VERSION}.exe";
+	SetOutPath "$INSTDIR\Content\css"
+	File "${BinDirectory}\Content\css\bootstrap.min.css"
+	File "${BinDirectory}\Content\css\bootstrap.min.css.map"
+	File "${BinDirectory}\Content\css\style.css"
+	SetOutPath "$INSTDIR\Content\js"
+	File "${BinDirectory}\Content\js\bootstrap.bundle.min.js"
+	File "${BinDirectory}\Content\js\bootstrap.bundle.min.js.map"
+	File "${BinDirectory}\Content\js\chart.bundle.min.js"
+	File "${BinDirectory}\Content\js\jquery-3.4.1.min.js"
+	File "${BinDirectory}\Content\js\status.js"
 	
 	SetOutPath "$INSTDIR\Views"
 	File "${BinDirectory}\Views\index.sshtml"
