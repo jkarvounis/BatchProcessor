@@ -1,7 +1,7 @@
 ﻿﻿@Each
 <div class="col-auto">
 	<div class="outlined">
-		<h3>@Current.Name</h3>
+		<h5>@Current.Name</h5>
 		Load: @Current.Current / @Current.Count <br/>
 		<div class="progress">
 		  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Current.LoadFormatted" aria-valuenow="@Current.Current" aria-valuemin="0" aria-valuemax="@Current.Count"></div>

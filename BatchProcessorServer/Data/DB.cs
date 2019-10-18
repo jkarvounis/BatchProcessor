@@ -134,9 +134,9 @@ namespace BatchProcessorServer.Data
         public static List<WorkerModel> GetWorkerInfo()
         {
             workerLocker.Wait();
-            List<WorkerModel> count = new List<WorkerModel>();
+            List<WorkerModel> output = new List<WorkerModel>();
             foreach (var pair in workers)
-                count.Add(new WorkerModel()
+                output.Add(new WorkerModel()
                 {
                     ID = pair.Value.ID,
                     Name = pair.Value.Name,
@@ -144,7 +144,8 @@ namespace BatchProcessorServer.Data
                     Current = pair.Value.JobList.Count
                 });
             workerLocker.Release();
-            return count;
+
+            return output.OrderBy(w => w.Name).ToList();
         }
 
         public static async Task<bool> StoreHeartbeat(Guid workerID, Guid jobID)

@@ -1,176 +1,200 @@
-﻿var dataPoints = [];
-var timeInMs = Date.now();
-var timeFormat = 'h:mm:ss';
-var ctx = document.getElementById('myChart').getContext('2d');
-var dataPointsPayload = [];
-var dataPointsQueue = [];
-var dataPointsWorkers = [];
-var dataPointsSlots = [];
-var dataPointsCurrent = [];
+﻿var BatchUpdate = function() {
+	
+	this.dataPoints = [];
+	this.timeInMs =Date.now();
+	this.timeFormat = 'h:mm:ss';	
+	this.dataPointsPayload = [];
+	this.dataPointsQueue = [];
+	this.dataPointsWorkers = [];
+	this.dataPointsSlots = [];
+	this.dataPointsCurrent = [];
 
-var config = {
-	type: 'line',
-	data: {			
-		datasets: [{
-			label: 'Payloads',
-			yAxisID: 'Low',
-			fill: false,
-			backgroundColor: 'black',
-			borderColor: 'black',
-			data: dataPointsPayload,
-		},{
-			label: 'Job Queue',
-			yAxisID: 'High',
-			fill: false,
-			backgroundColor: 'blue',
-			borderColor: 'blue',
-			data: dataPointsQueue,
-		},{
-			label: 'Workers',
-			yAxisID: 'Low',
-			fill: false,
-			backgroundColor: 'gray',
-			borderColor: 'gray',
-			data: dataPointsWorkers,
-		},{
-			label: 'Slots',
-			yAxisID: 'High',
-			fill: false,
-			backgroundColor: 'green',
-			borderColor: 'green',
-			data: dataPointsSlots,
-		},{
-			label: 'Current Jobs',
-			yAxisID: 'High',
-			fill: false,
-			backgroundColor: 'red',
-			borderColor: 'red',
-			data: dataPointsCurrent,
-		}]
-	},
-	options: {
-		scales: {
-			xAxes: [{
-				type: 'time',
-				time: {
-					unit: 'second',
-					distribution: 'linear',
-					ticks: {
-						source: 'auto'
-					},
-					displayFormats: {
-						quarter: timeFormat
-					}
-				},
-				scaleLabel: {
-                    display:     true,
-                    labelString: 'Time'
-                }
-			}],
-			yAxes: [{
-				id: 'Low',
-				type: 'linear',
-				position: 'left',
-                scaleLabel: {
-                    display:     true,
-					labelString: 'Payloads / Workers'
-                },
-				ticks: {
-					beginAtZero: true,
-					suggestedMax: 5
-				}
-            }, {
-				id: 'High',
-				type: 'linear',
-				position: 'right',
-                scaleLabel: {
-                    display:     true,
-					labelString: 'Jobs / Slots'
-                },
-				ticks: {
-					beginAtZero: true,
-					suggestedMax: 50
-				}
-            }]
+	this.config = {
+		type: 'line',
+		data: {			
+			datasets: [{
+				label: 'Payloads',
+				yAxisID: 'Low',
+				fill: false,
+				backgroundColor: 'black',
+				borderColor: 'black',
+				data: this.dataPointsPayload,
+			},{
+				label: 'Job Queue',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'blue',
+				borderColor: 'blue',
+				data: this.dataPointsQueue,
+			},{
+				label: 'Workers',
+				yAxisID: 'Low',
+				fill: false,
+				backgroundColor: 'gray',
+				borderColor: 'gray',
+				data: this.dataPointsWorkers,
+			},{
+				label: 'Slots',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'green',
+				borderColor: 'green',
+				data: this.dataPointsSlots,
+			},{
+				label: 'Current Jobs',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'red',
+				borderColor: 'red',
+				data: this.dataPointsCurrent,
+			}]
 		},
-		elements: {
-            point:{
-                radius: 0
-            }
-        },
-		responsiveAnimationDuration: 100,
-		maintainAspectRatio: true,
-		aspectRatio: 5
+		options: {
+			scales: {
+				xAxes: [{
+					type: 'time',
+					time: {
+						unit: 'second',
+						distribution: 'linear',
+						ticks: {
+							source: 'auto'
+						},
+						displayFormats: {
+							quarter: this.timeFormat
+						}
+					},
+					scaleLabel: {
+						display:     false
+					}
+				}],
+				yAxes: [{
+					id: 'Low',
+					type: 'linear',
+					position: 'left',
+					scaleLabel: {
+						display:     true,
+						labelString: 'Payloads / Workers'
+					},
+					ticks: {
+						beginAtZero: true,
+						suggestedMax: 5,
+						maxTicksLimit: 5
+					}
+				}, {
+					id: 'High',
+					type: 'linear',
+					position: 'right',
+					scaleLabel: {
+						display:     true,
+						labelString: 'Jobs / Slots'
+					},
+					ticks: {
+						beginAtZero: true,
+						suggestedMax: 50,
+						maxTicksLimit: 5
+					}
+				}]
+			},
+			elements: {
+				point:{
+					radius: 0
+				}
+			},
+			responsiveAnimationDuration: 100,
+			maintainAspectRatio: true,
+			aspectRatio: 4
+		}
+	};
+
+	this.ctx = $('#myChart');
+	this.myLine = new Chart(this.ctx, this.config);
+	
+	// Helper method to update arrays to preserve animation
+	this.updateDataArray = function(localData, serverData) {
+	
+		// Trim localData to preserve animations
+
+		if (serverData.length > 0) {
+			while (localData.length > 0 && localData[0].x < serverData[0].Key)			
+				localData.shift();			
+		} else {
+			localData.length = 0;
+		}
+		
+		// Append to localData to preserve animations
+
+		$.each(serverData, function(key, value) {
+			if (localData.length == 0 || localData[localData.length - 1].x < value.Key)
+			{
+				localData.push({
+					x: value.Key,
+					y: value.Value
+				});
+			}
+		});
+
+		// If we're somehow out of sync, just reset localData
+		if (localData.length != serverData.length) {
+			localData.length = 0;
+			$.each(serverData, function(key, value) {			
+				localData.push({
+					x: value.Key,
+					y: value.Value
+				});
+			});
+		}
 	}
-};
 
-window.onload = function () {
-	var ctx = document.getElementById("myChart").getContext("2d");
-	window.myLine = new Chart(ctx, config);	
-	updateStats();
-};
-
-function updateStats() {
-    $.getJSON("update/status", function(data) {
-
+	// Callback method from getJSON in updateStats
+	this.updateStatsCallback = function(data) {
+	
 		// Update status
 
-		document.getElementById("payloadCount").innerHTML = data.PayloadCount;
-		document.getElementById("queueCount").innerHTML = data.QueueSize;
-		document.getElementById("workerCount").innerHTML = data.TotalWorkers;
-		document.getElementById("totalCount").innerHTML = data.TotalCount;
-		document.getElementById("currentCount").innerHTML = data.TotalCurrent;
-		document.getElementById("currentLoad").innerHTML = data.TotalLoadFormatted;
+		$('#payloadCount').html(data.PayloadCount);
+		$('#queueCount').html(data.QueueSize);
+		$('#workerCount').html(data.TotalWorkers);
+		$('#totalCount').html(data.TotalCount);
+		$('#currentCount').html(data.TotalCurrent);
+		$('#currentLoad').html(data.TotalLoadFormatted);
 
 		// Update Chart
 		
-		updateDataArray(dataPointsPayload, data.ChartData.PayloadCount);
-		updateDataArray(dataPointsQueue, data.ChartData.QueueSize);
-		updateDataArray(dataPointsWorkers, data.ChartData.TotalWorkers);
-		updateDataArray(dataPointsSlots, data.ChartData.TotalCount);
-		updateDataArray(dataPointsCurrent, data.ChartData.TotalCurrent);
+		this.updateDataArray(this.dataPointsPayload, data.ChartData.PayloadCount);
+		this.updateDataArray(this.dataPointsQueue, data.ChartData.QueueSize);
+		this.updateDataArray(this.dataPointsWorkers, data.ChartData.TotalWorkers);
+		this.updateDataArray(this.dataPointsSlots, data.ChartData.TotalCount);
+		this.updateDataArray(this.dataPointsCurrent, data.ChartData.TotalCurrent);
 
 		if (data.ChartData.PayloadCount.length > 30)
-			config.options.scales.xAxes[0].time.unit = 'minute';
+			this.config.options.scales.xAxes[0].time.unit = 'minute';
 		else
-			config.options.scales.xAxes[0].time.unit = 'second';
+			this.config.options.scales.xAxes[0].time.unit = 'second';
 
-        window.myLine.update();
+		this.myLine.update();
 
 		// Update workers
+
 		var html = "";
 		$.each(data.Workers, function(key, value) {
-			html = html + '<div class="col-auto"><div class="outlined"><h3>' + value.Name + 
-			'</h3>Load: ' + value.Current + ' / ' + value.Count + 
+			html = html + '<div class="col-auto"><div class="outlined"><h5>' + value.Name + 
+			'</h5>Load: ' + value.Current + ' / ' + value.Count + 
 			'<br/><div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ' + value.LoadFormatted
 			+ '" aria-valuenow="' + value.Current + '" aria-valuemin="0" aria-valuemax="' + value.Count + '"></div></div></div></div>';
 		});
 
-		document.getElementById("workers").innerHTML = html;
+		$('#workers').html(html);
 
+		setTimeout($.proxy(this.updateStats, this), 3000);
+	}
 
-        setTimeout(function(){updateStats()}, 3000);
-    });
+	// Call once to perform repeated json queries to update page
+	this.updateStats = function() {
+		$.getJSON("update/status", $.proxy(this.updateStatsCallback, this));
+	}
 };
 
-function updateDataArray(localData, serverData) {
-	if (serverData.length > 0)
-	{
-		while (localData.length > 0 && localData[0].x < serverData[0].Key)			
-			localData.shift();			
-	}
-	else
-	{
-		localData.length = 0;
-	}
-		
-    $.each(serverData, function(key, value) {
-		if (localData.length == 0 || localData[localData.length - 1].x < value.Key)
-		{
-			localData.push({
-				x: value.Key,
-				y: value.Value
-			});
-		}
-    });
-}
+// Main entry point of script on window load
+$(function () {
+	window.batchData = new BatchUpdate();
+	window.batchData.updateStats();
+});
