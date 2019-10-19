@@ -273,7 +273,7 @@ namespace BatchProcessorServer.Data
                 TotalWorkers = new List<KeyValuePair<long, int>>()
             };
 
-            foreach (var element in chartData)
+            foreach (var element in chartData.OrderBy(p => p.Key))
             {
                 long time = element.Key.ToUnixTimeMilliseconds();
                 output.QueueSize.Add(new KeyValuePair<long, int>(time, element.Value.QueueSize));
