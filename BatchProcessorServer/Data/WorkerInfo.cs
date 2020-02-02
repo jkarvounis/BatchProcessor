@@ -7,6 +7,7 @@ namespace BatchProcessorServer.Data
     {
         public Guid ID { get; private set; }
         public string Name { get; private set; }
+        public string Details { get; private set; }
         public int Slots { get; private set; }
         public Dictionary<Guid, JobItem> JobList { get; private set; }
         public DateTime RegistrationTime { get; private set; }
@@ -15,6 +16,7 @@ namespace BatchProcessorServer.Data
         {
             ID = id;
             Name = "Not Set";
+            Details = "";
             Slots = 1;
             JobList = new Dictionary<Guid, JobItem>();
             RegistrationTime = DateTime.UtcNow;
@@ -25,10 +27,11 @@ namespace BatchProcessorServer.Data
             JobList.Add(job.job.ID, job);
         }
 
-        public void SetRegistrationInfo(int slots, string name)
+        public void SetRegistrationInfo(int slots, string name, string details)
         {
             Slots = slots;
             Name = name;
+            Details = details;
             RegistrationTime = DateTime.UtcNow;
         }
     }

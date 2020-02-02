@@ -176,10 +176,10 @@
 
 		var html = "";
 		$.each(data.Workers, function(key, value) {
-			html = html + '<div class="col-auto"><div class="outlined"><h5>' + value.Name + 
-			'</h5>Load: ' + value.Current + ' / ' + value.Count + 
-			'<br/><div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ' + value.LoadFormatted
-			+ '" aria-valuenow="' + value.Current + '" aria-valuemin="0" aria-valuemax="' + value.Count + '"></div></div></div></div>';
+			html = html + '<div class="col-auto"><div class="outlined"><div class="text-center"><h5>' + value.Name + '</h5>' + value.Details
+				+ '<br/>Load: ' + value.Current + ' / ' + value.Count
+				+ '<br/><div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ' + value.LoadFormatted
+				+ '" aria-valuenow="' + value.Current + '" aria-valuemin="0" aria-valuemax="' + value.Count + '"></div></div></div></div></div>';
 		});
 
 		$('#workers').html(html);

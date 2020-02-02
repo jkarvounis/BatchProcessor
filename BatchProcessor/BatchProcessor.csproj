@@ -47,6 +47,7 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -69,6 +70,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="Util\DetailsUtil.cs" />
     <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\Paths.cs" />
     <Compile Include="Util\PayloadUtil.cs" />

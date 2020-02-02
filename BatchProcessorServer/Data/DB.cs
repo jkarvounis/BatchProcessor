@@ -119,14 +119,14 @@ namespace BatchProcessorServer.Data
 
         // Workers
 
-        public static async Task RegisterWorkerAsync(Guid workerID, int slotCount, string name)
+        public static async Task RegisterWorkerAsync(Guid workerID, int slotCount, string name, string details)
         {
             await workerLocker.WaitAsync();
 
             if (!workers.ContainsKey(workerID))
                 workers.Add(workerID, new WorkerInfo(workerID));
 
-            workers[workerID].SetRegistrationInfo(slotCount, name);
+            workers[workerID].SetRegistrationInfo(slotCount, name, details);
 
             workerLocker.Release();
         }
@@ -140,6 +140,7 @@ namespace BatchProcessorServer.Data
                 {
                     ID = pair.Value.ID,
                     Name = pair.Value.Name,
+                    Details = pair.Value.Details,
                     Count = pair.Value.Slots,
                     Current = pair.Value.JobList.Count
                 });
