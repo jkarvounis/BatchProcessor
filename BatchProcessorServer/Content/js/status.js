@@ -9,7 +9,7 @@
 	this.dataPointsSlots = [];
 	this.dataPointsCurrent = [];
 
-	this.config = {
+	this.configWorkers = {
 		type: 'line',
 		data: {			
 			datasets: [{
@@ -20,33 +20,12 @@
 				borderColor: 'black',
 				data: this.dataPointsPayload,
 			},{
-				label: 'Job Queue',
-				yAxisID: 'High',
-				fill: false,
-				backgroundColor: 'blue',
-				borderColor: 'blue',
-				data: this.dataPointsQueue,
-			},{
 				label: 'Workers',
 				yAxisID: 'Low',
 				fill: false,
 				backgroundColor: 'gray',
 				borderColor: 'gray',
 				data: this.dataPointsWorkers,
-			},{
-				label: 'Slots',
-				yAxisID: 'High',
-				fill: false,
-				backgroundColor: 'green',
-				borderColor: 'green',
-				data: this.dataPointsSlots,
-			},{
-				label: 'Current Jobs',
-				yAxisID: 'High',
-				fill: false,
-				backgroundColor: 'red',
-				borderColor: 'red',
-				data: this.dataPointsCurrent,
 			}]
 		},
 		options: {
@@ -80,12 +59,69 @@
 						suggestedMax: 5,
 						maxTicksLimit: 5
 					}
-				}, {
+				}]
+			},
+			elements: {
+				point:{
+					radius: 0
+				}
+			},
+			responsiveAnimationDuration: 100,
+			maintainAspectRatio: true,
+			aspectRatio: 2
+		}
+	};
+
+	this.configSlots = {
+		type: 'line',
+		data: {
+			datasets: [{
+				label: 'Job Queue',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'blue',
+				borderColor: 'blue',
+				data: this.dataPointsQueue,
+			}, {
+				label: 'Slots',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'green',
+				borderColor: 'green',
+				data: this.dataPointsSlots,
+			}, {
+				label: 'Current Jobs',
+				yAxisID: 'High',
+				fill: false,
+				backgroundColor: 'red',
+				borderColor: 'red',
+				data: this.dataPointsCurrent,
+			}]
+		},
+		options: {
+			scales: {
+				xAxes: [{
+					type: 'time',
+					time: {
+						unit: 'second',
+						distribution: 'linear',
+						ticks: {
+							source: 'auto'
+						},
+						displayFormats: {
+							quarter: this.timeFormat
+						}
+					},
+					scaleLabel: {
+						display: false
+					}
+				}],
+				yAxes: [{
 					id: 'High',
 					type: 'linear',
 					position: 'right',
 					scaleLabel: {
-						display:     true,
+						display: true,
 						labelString: 'Jobs / Slots'
 					},
 					ticks: {
@@ -96,18 +132,20 @@
 				}]
 			},
 			elements: {
-				point:{
+				point: {
 					radius: 0
 				}
 			},
 			responsiveAnimationDuration: 100,
 			maintainAspectRatio: true,
-			aspectRatio: 4
+			aspectRatio: 2
 		}
 	};
 
-	this.ctx = $('#myChart');
-	this.myLine = new Chart(this.ctx, this.config);
+	this.ctxWorkers = $('#myChartWorkers');
+	this.ctxSlots = $('#myChartSlots');	
+	this.myLineWorkers = new Chart(this.ctxWorkers, this.configWorkers);
+	this.myLineSlots = new Chart(this.ctxSlots, this.configSlots);
 	
 	// Helper method to update arrays to preserve animation
 	this.updateDataArray = function(localData, serverData) {
@@ -165,12 +203,16 @@
 		this.updateDataArray(this.dataPointsSlots, data.ChartData.TotalCount);
 		this.updateDataArray(this.dataPointsCurrent, data.ChartData.TotalCurrent);
 
-		if (data.ChartData.PayloadCount.length > 30)
-			this.config.options.scales.xAxes[0].time.unit = 'minute';
-		else
-			this.config.options.scales.xAxes[0].time.unit = 'second';
+		if (data.ChartData.PayloadCount.length > 30) {
+			this.configWorkers.options.scales.xAxes[0].time.unit = 'minute';
+			this.configSlots.options.scales.xAxes[0].time.unit = 'minute';
+		} else {
+			this.configWorkers.options.scales.xAxes[0].time.unit = 'second';
+			this.configSlots.options.scales.xAxes[0].time.unit = 'second';
+		}
 
-		this.myLine.update();
+		this.myLineWorkers.update();
+		this.myLineSlots.update();
 
 		// Update workers
 

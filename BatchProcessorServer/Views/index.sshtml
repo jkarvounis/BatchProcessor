@@ -51,9 +51,12 @@
                 </div>        
             </div>
         </div>
-        <div class="row justify-content-around">            
-            <div id ="graph" class="outlined col-12 md-auto">
-                <canvas id="myChart"></canvas>
+        <div class="row outlined justify-content-around">            
+            <div class="col col-md-6">
+                <canvas id="myChartWorkers"></canvas>
+            </div>
+            <div class="col col-md-6">
+                <canvas id="myChartSlots"></canvas>
             </div>            
         </div>      
     </div>
