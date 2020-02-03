@@ -123,7 +123,8 @@ Both the BatchProcessorServerUI and BatchProcessorServer have the same config bu
 
 # Change log
 
-* ***Version 2.2.0*** - Public release.  Improved server status page.
+* ***Version 2.2.1*** - Public release.  Fixed release installers / executables
+* ***Version 2.2.0*** - Improved server status page.
 * ***Version 2.1.0*** - Public release.  Improved server status page and data management.
 * ***Version 2.0.2*** - Public release.  Fully tested and published on Nuget.
 * Version 2.0.1 - Minor fixes
