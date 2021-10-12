@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BatchProcessorAPI\BatchProcessorAPI.csproj" />
+    <ProjectReference Include="..\TestShared\TestShared.csproj" />
   </ItemGroup>
 
 </Project>
