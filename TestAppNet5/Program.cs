@@ -8,7 +8,7 @@ namespace TestApp
 {
     class Program
     {
-        private readonly static string SERVER_IP = "localhost";
+        private readonly static string SERVER_IP = "cluster.trxsystems.net";
         private readonly static int SERVER_PORT = 1200;
 
         private readonly static int MAX_PARALLEL = 100;
@@ -16,7 +16,7 @@ namespace TestApp
         static object locker = new object();
 
         static void Main(string[] args)
-        {            
+        {
             if (args.Length > 0)
             {
                 // Case to handle for executing a single job.  Typically this should be a lengthy task to run on the remote side.
@@ -34,7 +34,7 @@ namespace TestApp
             else
             {
                 // Main entry to handle requesting jobs
-                Console.WriteLine("Test App");                
+                Console.WriteLine("Test App");
 
                 // Create 20 sample jobs
                 // Command must be and executable in the contents of the payload
@@ -42,14 +42,15 @@ namespace TestApp
                 // Arguments are optional
                 List<Job> jobs = new List<Job>();
                 for (int i = 0; i < MAX_PARALLEL; i++)
-                    jobs.Add(new Job($"Job-{i}", "TestApp.exe", i.ToString(), "output.txt"));
+                    jobs.Add(new Job($"Job-{i}", "TestAppNet5.exe", i.ToString(), "output.txt"));
 
                 // Create Job Scheduler, point to server IP and port
                 JobScheduler scheduler = new JobScheduler(SERVER_IP, SERVER_PORT, MAX_PARALLEL);
+                scheduler.Timeout = TimeSpan.FromMinutes(10);
 
                 // Convert current working directory into payload for job execution                
                 string payloadFile = PayloadUtil.CreatePayloadFileWithWorkingDirectory();
-                
+
                 Console.WriteLine("Sending Payload");
 
                 // Upload current payload to the cluster
@@ -72,7 +73,7 @@ namespace TestApp
                             if (response.Completed)
                                 completed++;
                         }
-                    });                    
+                    });
 
                     // Wait for user input before exiting
                     Console.WriteLine($"Done Sending Jobs - Completed: {completed}");
@@ -85,7 +86,7 @@ namespace TestApp
                 {
                     Console.WriteLine($"Failed to upload payload");
                 }
-                
+
 
                 Console.WriteLine("Press ENTER to exit.");
                 Console.ReadLine();
