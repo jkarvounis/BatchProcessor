@@ -16,6 +16,19 @@ namespace BatchProcessorAPI
         readonly IRestClient client;
         Guid? payloadID;
 
+        public TimeSpan Timeout
+        {
+            get
+            { 
+                return TimeSpan.FromMilliseconds(client.Timeout);
+            }
+            set
+            {
+
+                client.Timeout = (int)value.TotalMilliseconds;
+            }
+        }
+
         /// <summary>
         /// Constructor for the scheduler.  Requires remote server to be running with a valid hostname and TCP port
         /// </summary>
@@ -24,7 +37,7 @@ namespace BatchProcessorAPI
         /// <param name="maxConcurrent">Maximum concurrent jobs [Default 256]</param>
         public JobScheduler(string serverHostname, int tcpPort, int maxConcurrent = 256)
         {
-            ServicePointManager.DefaultConnectionLimit = maxConcurrent;            
+            ServicePointManager.DefaultConnectionLimit = maxConcurrent;
             client = new RestClient($"http://{serverHostname}:{tcpPort}")
                 .UseSerializer(() => new JsonNetSerializer());
             payloadID = null;
