@@ -9,6 +9,7 @@ Jobs are defined as an executable command with optional arguments.  A job can re
 # Batch Processor API
 
 The API is on Nuget under ***BatchProcessorAPI***, or include the API project directly if not using Nuget.
+[Nuget Package Link](https://www.nuget.org/packages/BatchProcessorAPI)
 
 This API currently targets .NET Standard 2.0, which is compatable with .NET Core 2.0 and later, .NET Framework 4.6.1 and later, and Mono 5.4 and later.
 
@@ -123,6 +124,7 @@ Both the BatchProcessorServerUI and BatchProcessorServer have the same config bu
 
 # Change log
 
+* ***Version 2.2.2*** - Public release.  Updated reference packages for security and test projects to support .Net 5
 * ***Version 2.2.1*** - Public release.  Fixed release installers / executables
 * Version 2.2.0 - Improved server status page.
 * ***Version 2.1.0*** - Public release.  Improved server status page and data management.
@@ -133,6 +135,7 @@ Both the BatchProcessorServerUI and BatchProcessorServer have the same config bu
 * Version 1.0.1 - Updated Nuget package to include proper dependencies.  Server install in now more reliable, minor bug fixes.
 * Version 1.0.0 - Initial public release!  Downloadable installer created.  Nuget package available.
 * Version 0.0.1 - This is not released yet.  Still a work in progress.
+
 
 *If you feel generous, and wish to support my projects:*
 
